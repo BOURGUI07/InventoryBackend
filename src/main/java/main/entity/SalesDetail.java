@@ -6,6 +6,7 @@ package main.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -26,6 +27,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SalesDetail extends BaseEntity{
+    @EmbeddedId
+    private SalesDetailId id;
+    
     @ManyToOne
     @JoinColumn(name="product_id")
     @JsonBackReference
