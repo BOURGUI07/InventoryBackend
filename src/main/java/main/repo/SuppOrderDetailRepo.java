@@ -4,6 +4,7 @@
  */
 package main.repo;
 
+import main.entity.SuppOrderDetail;
 import main.entity.SuppOrderDetailId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,6 @@ import org.springframework.stereotype.Repository;
  * @author hp
  */
 @Repository
-public interface SuppOrderDetailRepo extends JpaRepository<SuppOrderDetailId, SuppOrderDetailId>{
+public interface SuppOrderDetailRepo extends JpaRepository<SuppOrderDetail, SuppOrderDetailId>{
     
 }
