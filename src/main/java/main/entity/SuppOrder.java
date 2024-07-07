@@ -4,6 +4,8 @@
  */
 package main.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,9 +40,11 @@ public class SuppOrder extends BaseEntity{
     
     @ManyToOne
     @JoinColumn(name="supplier_id")
+    @JsonBackReference
     private Supplier supplier;
     
     @OneToMany(mappedBy="suppOrder")
+    @JsonManagedReference
     private List<SuppOrderDetail> suppOrderDetails;
     
     @Column(name="code")

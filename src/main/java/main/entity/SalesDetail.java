@@ -4,6 +4,7 @@
  */
 package main.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -27,10 +28,12 @@ import lombok.NoArgsConstructor;
 public class SalesDetail extends BaseEntity{
     @ManyToOne
     @JoinColumn(name="product_id")
+    @JsonBackReference
     private Product product;
     
     @ManyToOne
     @JoinColumn(name="sales_id")
+    @JsonBackReference
     private Sales sales;
     
     @Column(name="quantity")

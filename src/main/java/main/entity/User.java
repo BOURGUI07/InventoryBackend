@@ -4,6 +4,7 @@
  */
 package main.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +37,7 @@ public class User extends BaseEntity{
     
     @ManyToOne
     @JoinColumn(name="company_id")
+    @JsonBackReference
     private Company company;
     
     @Column(name="name")

@@ -4,13 +4,14 @@
  */
 package main.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -34,7 +35,8 @@ public class Supplier extends BaseEntity{
     @Column(name="supplier_id")
     private Integer id;
     
-    @OneToOne(mappedBy="supplier")
+    @OneToMany(mappedBy="supplier")
+    @JsonManagedReference
     private List<SuppOrder> suppOrders;
     
     @Column(name="firstname")

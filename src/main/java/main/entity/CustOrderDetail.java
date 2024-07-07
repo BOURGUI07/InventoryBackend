@@ -4,6 +4,7 @@
  */
 package main.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -31,10 +32,12 @@ public class CustOrderDetail extends BaseEntity{
     
     @ManyToOne
     @JoinColumn(name="product_id")
+    @JsonBackReference
     private Product product;
     
     @ManyToOne
     @JoinColumn(name="cust_order_id")
+    @JsonBackReference
     private CustOrder custOrder;
     
     @Column(name="quantity")

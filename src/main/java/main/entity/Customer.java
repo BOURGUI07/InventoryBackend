@@ -4,6 +4,7 @@
  */
 package main.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -35,6 +36,7 @@ public class Customer extends BaseEntity{
     private Integer id;
     
     @OneToMany(mappedBy="customer")
+    @JsonManagedReference
     private List<CustOrder> custOrders;
     
     @Column(name="firstname")
