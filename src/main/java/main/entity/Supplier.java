@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +38,17 @@ public class Supplier extends BaseEntity{
     
     @OneToMany(mappedBy="supplier")
     @JsonManagedReference
-    private List<SuppOrder> suppOrders;
+    private List<SuppOrder> suppOrders = new ArrayList<>();
+    
+    public void addOrder(SuppOrder o){
+        suppOrders.add(o);
+        o.setSupplier(this);
+    }
+    
+    public void removeorder(SuppOrder o){
+        suppOrders.remove(o);
+        o.setSupplier(null);
+    }
     
     @Column(name="firstname")
     private String firstName;

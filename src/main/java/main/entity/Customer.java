@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +38,7 @@ public class Customer extends BaseEntity{
     
     @OneToMany(mappedBy="customer")
     @JsonManagedReference
-    private List<CustOrder> custOrders;
+    private List<CustOrder> custOrders = new ArrayList<>();
     
     @Column(name="firstname")
     private String firstName;
@@ -56,4 +57,14 @@ public class Customer extends BaseEntity{
     
     @Column(name="pic")
     private String pic;
+    
+    public void addOrder(CustOrder o){
+        custOrders.add(o);
+        o.setCustomer(this);
+    }
+    
+    public void removeOrder(CustOrder o){
+        custOrders.remove(o);
+        o.setCustomer(null);
+    }
 }

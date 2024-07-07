@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,7 +38,7 @@ public class Sales extends BaseEntity{
     
     @OneToMany(mappedBy="sales")
     @JsonManagedReference
-    private List<SalesDetail> salesDetails;
+    private List<SalesDetail> salesDetails = new ArrayList<>();
     
     @Column(name="code")
     private String code;

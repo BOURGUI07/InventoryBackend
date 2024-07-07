@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -60,31 +62,31 @@ public class Product extends BaseEntity{
     
     @OneToMany(mappedBy="product")
     @JsonManagedReference
-    private List<StockMvm> stockMvms;
+    private List<StockMvm> stockMvms = new ArrayList<>();
     
     
     @OneToMany(mappedBy="product")
     @JsonManagedReference
-    private List<CustOrderDetail> custOrderDetails;
+    private List<CustOrderDetail> custOrderDetails = new ArrayList<>();
     
     
     @OneToMany(mappedBy="product")
     @JsonManagedReference
-    private List<SuppOrderDetail> suppOrderDetails;
+    private List<SuppOrderDetail> suppOrderDetails = new ArrayList<>();
     
     
     
     @OneToMany(mappedBy="product")
     @JsonManagedReference
-    private List<SalesDetail> salesDetails;
+    private List<SalesDetail> salesDetails = new ArrayList<>();
     
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="category_id")
     @JsonBackReference
     private Category categ;
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="company_id")
     @JsonBackReference
     private Company company;

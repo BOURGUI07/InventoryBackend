@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -52,5 +53,5 @@ public class CustOrder extends BaseEntity{
     
     @OneToMany(mappedBy="custOrder")
     @JsonManagedReference
-    private List<CustOrderDetail> custOrderDetails;
+    private List<CustOrderDetail> custOrderDetails = new ArrayList<>();
 }

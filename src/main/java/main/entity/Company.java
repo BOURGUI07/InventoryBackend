@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,12 +37,32 @@ public class Company extends BaseEntity{
     
     @OneToMany(mappedBy="company")
     @JsonManagedReference
-    private List<Product> products;
+    private List<Product> products = new ArrayList<>();
     
     @OneToMany(mappedBy="company")
     @JsonManagedReference
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
     
     @Column(name="name")
     private String name;
+    
+    public void addProduct(Product p){
+        products.add(p);
+        p.setCompany(this);
+    }
+    
+    public void removeProduct(Product p){
+        products.remove(p);
+        p.setCompany(null);
+    }
+    
+    public void addUser(User p){
+        users.add(p);
+        p.setCompany(this);
+    }
+    
+    public void removeUser(User p){
+        users.remove(p);
+        p.setCompany(null);
+    }
 }
