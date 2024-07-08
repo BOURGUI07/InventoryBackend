@@ -4,6 +4,8 @@
  */
 package main.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.List;
 import main.entity.SuppOrderDetailId;
@@ -13,9 +15,12 @@ import main.entity.SuppOrderDetailId;
  * @author hp
  */
 public record SuppOrderDTO(
+            @NotNull(message="Id can't be null")
             Integer id,
+            @NotBlank(message = "order code is mandatory")
             String code,
             Instant date,
+            @NotNull(message="supplierId  can't be null!")
             Integer supplierId,
             List<SuppOrderDetailId> suppOrderDetailIds
         ) {

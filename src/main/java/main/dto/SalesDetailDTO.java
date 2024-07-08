@@ -4,6 +4,7 @@
  */
 package main.dto;
 
+import jakarta.validation.constraints.NotNull;
 import main.entity.SalesDetailId;
 
 /**
@@ -12,7 +13,9 @@ import main.entity.SalesDetailId;
  */
 public record SalesDetailDTO(
             SalesDetailId id,
+            @NotNull(message="productId can't be null")
             Integer productId,
+            @NotNull(message="SalesId can't be null")
             Integer salesId,
             Integer quantity
         ) {

@@ -4,12 +4,16 @@
  */
 package main.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 /**
  *
  * @author hp
  */
 public record StockMvmDTO(
+            @NotNull(message="Id can't be null")
             Integer id,
+            @NotNull(message="ProductId can't be null. StockMvm has to belong to a product")
             Integer productId
         ) {
 
