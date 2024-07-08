@@ -1,0 +1,124 @@
+drop database if exists inventory;
+create database inventory;
+
+use inventory;
+
+drop table if exists category;
+create table category(
+	category_id INTEGER auto_increment primary key,
+    category_name varchar(50) not null,
+    description varchar(50)
+);
+
+drop table if exists company;
+create table company(
+	company_id INTEGER auto_increment primary key,
+    company_name varchar(50) not null
+);
+
+drop table if exists users;
+create table users(
+	user_id INTEGER auto_increment primary key,
+    username varchar(50) not null,
+    company_id integer not null,
+    foreign key(company_id) references company(company_id)
+);
+
+drop table if exists product;
+create table product(
+	product_id INTEGER auto_increment primary key,
+    product_name varchar(50) not null,
+    product_desc varchar(50),
+    price decimal(10,2),
+    vat_rate decimal(10,2),
+    price__ttc decimal(10,2),
+    pic varchar(100),
+    category_id integer not null,
+    company_id integer not null,
+    foreign key (category_id) references category(category_id),
+    foreign key (company_id) references company(company_id)
+);
+
+drop table if exists customer;
+create table customer(
+	customer_id INTEGER auto_increment primary key,
+    firstname varchar(50) not null,
+    lastname varchar(50) not null,
+    email varchar(100) not null,
+    phone varchar(100),
+    pic varchar(100)
+);
+
+drop table if exists supplier;
+create table supplier(
+	supplier_id INTEGER auto_increment primary key,
+    firstname varchar(50) not null,
+    lastname varchar(50) not null,
+    email varchar(100) not null,
+    phone varchar(100),
+    pic varchar(100)
+);
+
+drop table if exists sales;
+create table sales(
+	sales_id INTEGER auto_increment primary key,
+    sales_code varchar(50) not null
+);
+
+drop table if exists cust_order;
+create table cust_order(
+	cust_order_id INTEGER auto_increment primary key,
+    order_code varchar(50) not null,
+    order_date TIMESTAMP,
+    customer_id integer not null,
+    foreign key(customer_id) references customer(customer_id)
+);
+
+drop table if exists supp_order;
+create table supp_order(
+	supp_order_id INTEGER auto_increment primary key,
+    order_code varchar(50) not null,
+    order_date TIMESTAMP,
+    supplier_id integer not null,
+    foreign key(supplier_id) references supplier(supplier_id)
+);
+
+drop table if exists sales_detail;
+create table sales_detail(
+	product_id integer not null,
+    sales_id integer not null,
+    quantity integer not null,
+    foreign key (product_id) references product(product_id),
+    foreign key (sales_id) references sales(sales_id)
+);
+
+drop table if exists cust_order_detail;
+create table cust_order_detail(
+	product_id integer not null,
+    cust_order_id integer not null,
+    quantity integer not null,
+    foreign key (product_id) references product(product_id),
+    foreign key (cust_order_id) references cust_order(cust_order_id)
+);
+
+
+drop table if exists supp_order_detail;
+create table supp_order_detail(
+	product_id integer not null,
+    supp_order_id integer not null,
+    quantity integer not null,
+    foreign key (product_id) references product(product_id),
+    foreign key (supp_order_id) references supp_order(supp_order_id)
+);
+
+drop table if exists stock_mvm;
+create table stock_mvm(
+	stock_id integer auto_increment primary key,
+    product_id integer not null,
+    foreign key(product_id) references product(product_id)
+);
+
+drop table if exists roles;
+create table roles(
+	role_name varchar(50) not null
+);

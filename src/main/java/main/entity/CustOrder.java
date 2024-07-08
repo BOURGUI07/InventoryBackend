@@ -39,7 +39,7 @@ public class CustOrder extends BaseEntity{
     @Column(name="cust_order_id")
     private Integer id;
     
-    @Column(name="code")
+    @Column(name="order_code")
     private String code;
     
     

@@ -43,7 +43,7 @@ public class Company extends BaseEntity{
     @JsonManagedReference
     private List<User> users = new ArrayList<>();
     
-    @Column(name="name")
+    @Column(name="company_name")
     private String name;
     
     public void addProduct(Product p){

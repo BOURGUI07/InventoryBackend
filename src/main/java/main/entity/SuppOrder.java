@@ -48,7 +48,7 @@ public class SuppOrder extends BaseEntity{
     @JsonManagedReference
     private List<SuppOrderDetail> suppOrderDetails  = new ArrayList<>();
     
-    @Column(name="code")
+    @Column(name="order_code")
     private String code;
     
     

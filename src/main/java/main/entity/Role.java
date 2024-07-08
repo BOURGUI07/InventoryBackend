@@ -23,6 +23,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Role extends BaseEntity{
-    @Column(name="name")
+    @Column(name="role_name")
     private String name;
 }

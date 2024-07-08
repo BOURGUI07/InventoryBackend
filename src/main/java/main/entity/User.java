@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
  * @author hp
  */
 @Entity
-@Table(name="user")
+@Table(name="users")
 @Data
 @EqualsAndHashCode(callSuper=true)
 @NoArgsConstructor
@@ -40,6 +40,6 @@ public class User extends BaseEntity{
     @JsonBackReference
     private Company company;
     
-    @Column(name="name")
+    @Column(name="username")
     private String name;
 }

@@ -39,10 +39,10 @@ public class Category extends BaseEntity{
     @JsonManagedReference
     private List<Product> products = new ArrayList<>();
     
-    @Column(name="name")
+    @Column(name="category_name")
     private String name;
     
-    @Column(name="desc")
+    @Column(name="description")
     private String desc;
     
     public void addProduct(Product p){

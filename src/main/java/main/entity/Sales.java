@@ -40,6 +40,6 @@ public class Sales extends BaseEntity{
     @JsonManagedReference
     private List<SalesDetail> salesDetails = new ArrayList<>();
     
-    @Column(name="code")
+    @Column(name="sales_code")
     private String code;
 }

@@ -41,10 +41,10 @@ public class Product extends BaseEntity{
     private Integer id;
     
     
-    @Column(name="name")
+    @Column(name="product_name")
     private String name;
     
-    @Column(name="desc")
+    @Column(name="product_desc")
     private String desc;
     
     @Column(name="price")
