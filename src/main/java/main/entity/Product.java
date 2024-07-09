@@ -90,4 +90,34 @@ public class Product extends BaseEntity{
     @JoinColumn(name="company_id")
     @JsonBackReference
     private Company company;
+    
+    public void addSalesDetail(SalesDetail x){
+        this.salesDetails.add(x);
+        x.setProduct(this);
+    }
+    
+    public void addCustOrderDetail(CustOrderDetail x){
+        this.custOrderDetails.add(x);
+        x.setProduct(this);
+    }
+    
+    public void addStockMvm(StockMvm x){
+        this.stockMvms.add(x);
+        x.setProduct(this);
+    }
+    
+    public void removeSalesDetail(SalesDetail x){
+        this.salesDetails.remove(x);
+        x.setProduct(null);
+    }
+    
+    public void removeCustOrderDetail(CustOrderDetail x){
+        this.custOrderDetails.remove(x);
+        x.setProduct(null);
+    }
+    
+    public void removeStockMvm(StockMvm x){
+        this.stockMvms.remove(x);
+        x.setProduct(null);
+    }
 }

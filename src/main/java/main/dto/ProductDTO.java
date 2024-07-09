@@ -25,6 +25,7 @@ public record ProductDTO(
         @Size(min = 3, max = 50, message = "product name must be between 3 and 50 characters")
         String name, 
         String desc,
+        @NotBlank(message = "Product Price is Mandatory")
         BigDecimal price,
         BigDecimal vatRate,
         BigDecimal priceTTC,
