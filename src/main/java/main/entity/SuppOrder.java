@@ -54,4 +54,14 @@ public class SuppOrder extends BaseEntity{
     
     @Column(name="order_date")
     private Instant orderDate;
+    
+    public void addDetail(SuppOrderDetail d){
+        this.suppOrderDetails.add(d);
+        d.setSuppOrder(this);
+    }
+    
+    public void removeDetail(SuppOrderDetail d){
+        this.suppOrderDetails.remove(d);
+        d.setSuppOrder(null);
+    }
 }
