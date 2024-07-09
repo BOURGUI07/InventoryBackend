@@ -109,13 +109,69 @@ public class CompanyService {
     public void delete(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
-            if(!c.getProducts().isEmpty()){
-                c.getProducts().forEach(x -> c.removeProduct(x));
+            var list = c.getProducts();
+            var list1 = c.getUsers();
+            if(!list.isEmpty()){
+                list.forEach(x -> c.removeProduct(x));
+                productRepo.saveAll(list);
             }
-            if(!c.getUsers().isEmpty()){
-                c.getUsers().forEach(x -> c.removeUser(x));
+            if(!list1.isEmpty()){
+                list1.forEach(x -> c.removeUser(x));
+                userRepo.saveAll(list1);
             }
             repo.delete(c);
+        }
+    }
+    
+    @Transactional
+    public void addProductToCompany(Integer companyId, Integer productId){
+        var c = repo.findById(companyId).orElse(null);
+        if(c!=null){
+            var p = productRepo.findById(productId).orElse(null);
+            if(p!=null){
+                c.addProduct(p);
+                repo.save(c);
+                productRepo.save(p);
+            }
+        }
+    }
+    
+    @Transactional
+    public void removeProductFromCompany(Integer companyid, Integer productId){
+        var c = repo.findById(companyid).orElse(null);
+        if(c!=null){
+            var p = productRepo.findById(productId).orElse(null);
+            if(p!=null){
+                c.removeProduct(p);
+                repo.save(c);
+                productRepo.save(p);
+            }
+        }
+    }
+    
+    @Transactional
+    public void addUserToCompany(Integer companyId, Integer userid){
+        var c = repo.findById(companyId).orElse(null);
+        if(c!=null){
+            var u = userRepo.findById(userid).orElse(null);
+            if(u!=null){
+                c.addUser(u);
+                repo.save(c);
+                userRepo.save(u);
+            }
+        }
+    }
+    
+    @Transactional
+    public void removeUserFromCompany(Integer companyid, Integer userid){
+        var c = repo.findById(companyid).orElse(null);
+        if(c!=null){
+            var u = userRepo.findById(userid).orElse(null);
+            if(u!=null){
+                c.removeUser(u);
+                repo.save(c);
+                userRepo.save(u);
+            }
         }
     }
 }

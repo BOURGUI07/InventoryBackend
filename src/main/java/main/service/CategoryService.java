@@ -80,12 +80,42 @@ public class CategoryService {
     public void delete(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
-            if(!c.getProducts().isEmpty()){
-                c.getProducts().stream().forEach(x -> c.removeProduct(x));
+            var list = c.getProducts();
+            if(!list.isEmpty()){
+                list.stream().forEach(c::removeProduct);
+                productRepo.saveAll(list);
             }
             repo.delete(c);
         }
     }
+    
+    @Transactional
+    public void addProductToCateg(Integer categId, Integer productId){
+        var c = repo.findById(categId).orElse(null);
+        if(c!=null){
+            var p = productRepo.findById(productId).orElse(null);
+            if(p!=null){
+                c.addProduct(p);
+                repo.save(c);
+                productRepo.save(p);
+            }
+        }
+    }  
+    
+    
+    @Transactional
+    public void removeProductFromCateg(Integer categId, Integer productId){
+        var c = repo.findById(categId).orElse(null);
+        if(c!=null){
+            var p = productRepo.findById(productId).orElse(null);
+            if(p!=null){
+                c.removeProduct(p);
+                repo.save(c);
+                productRepo.save(p);
+            }
+        }
+    }
+    
     
     public CategoryDTO findById(Integer id){
         var c = repo.findById(id).orElse(null);
@@ -96,7 +126,7 @@ public class CategoryService {
     }
     
     public List<CategoryDTO> findAll(){
-        return repo.findAll().stream().map(x -> mapper.toDTO(x)).collect(Collectors.toList());
+        return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
     
     public CategoryDTO findByName(String name){
@@ -110,4 +140,6 @@ public class CategoryService {
             return null;
         }
     }
+    
+    
 }

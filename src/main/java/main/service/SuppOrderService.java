@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import main.dto.SuppOrderDTO;
 import main.entity.SuppOrder;
+import main.entity.SuppOrderDetailId;
 import main.mapper.SuppOrderMapper;
 import main.repo.SuppOrderDetailRepo;
 import main.repo.SuppOrderRepo;
@@ -108,10 +109,40 @@ public class SuppOrderService {
     public void delete(Integer id){
         var o = repo.findById(id).orElse(null);
         if(o!=null){
-            if(!o.getSuppOrderDetails().isEmpty()){
-                o.getSuppOrderDetails().forEach(x -> o.removeDetail(x));
+            var list = o.getSuppOrderDetails();
+            if(!list.isEmpty()){
+                list.forEach(x -> o.removeDetail(x));
+                detailRepo.saveAll(list);
             }
             repo.delete(o);
+        }
+    }
+    
+    @Transactional
+    public void adddetailToOrder(Integer orderid, Integer productId){
+        var detailId = new SuppOrderDetailId(productId,orderid);
+        var o = repo.findById(orderid).orElse(null);
+        if(o!=null){
+            var detail = detailRepo.findById(detailId).orElse(null);
+            if(detail!=null){
+                o.addDetail(detail);
+                repo.save(o);
+                detailRepo.save(detail);
+            }
+        }
+    }
+    
+    @Transactional
+    public void removeDetailFromOrder(Integer orderid, Integer productId){
+        var detailId = new SuppOrderDetailId(productId,orderid);
+        var o = repo.findById(orderid).orElse(null);
+        if(o!=null){
+            var detail = detailRepo.findById(detailId).orElse(null);
+            if(detail!=null){
+                o.removeDetail(detail);
+                repo.save(o);
+                detailRepo.save(detail);
+            }
         }
     }
 }

@@ -106,9 +106,22 @@ public class ProductService {
     public void deleteProduct(Integer id){
         var p = productRepo.findById(id).orElse(null);
         if(p!=null){
-            p.getSalesDetails().stream().forEach(x -> p.removeSalesDetail(x));
-            p.getStockMvms().stream().forEach(x -> p.removeStockMvm(x));
-            p.getCustOrderDetails().stream().forEach(x -> p.removeCustOrderDetail(x));
+            var list = p.getSalesDetails();
+            if(!list.isEmpty()){
+                list.stream().forEach(x -> p.removeSalesDetail(x));
+                salesRepo.saveAll(list);
+            }
+            var list1 = p.getStockMvms();
+            if(!list1.isEmpty()){
+                list1.stream().forEach(x -> p.removeStockMvm(x));
+                stockRepo.saveAll(list1);
+            }
+            var list2 = p.getCustOrderDetails();
+            if(!list2.isEmpty()){
+                list2.stream().forEach(x -> p.removeCustOrderDetail(x));
+                custRepo.saveAll(list2);
+            }
+            
             productRepo.delete(p);
         }
     } 
