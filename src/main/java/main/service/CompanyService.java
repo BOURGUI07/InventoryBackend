@@ -50,7 +50,7 @@ public class CompanyService {
     private Validator validator;
     
     public CompanyDTO findByName(String name){
-        var q = "SELECT * FROM category WHERE company_name= :x";
+        var q = "SELECT * FROM company WHERE company_name= :x";
         Company c =  (Company)em.createNativeQuery(q, Company.class).setHint("x", name).getSingleResult();
         try{
             return mapper.toDTO(c);

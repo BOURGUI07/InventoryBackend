@@ -54,4 +54,15 @@ public class CustOrder extends BaseEntity{
     @OneToMany(mappedBy="custOrder")
     @JsonManagedReference
     private List<CustOrderDetail> custOrderDetails = new ArrayList<>();
+    
+    
+    public void addDetail(CustOrderDetail d){
+        this.custOrderDetails.add(d);
+        d.setCustOrder(this);
+    }
+    
+    public void removeDetail(CustOrderDetail d){
+        this.custOrderDetails.remove(d);
+        d.setCustOrder(null);
+    }
 }
