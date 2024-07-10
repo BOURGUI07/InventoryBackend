@@ -71,4 +71,15 @@ public class User extends BaseEntity{
     @OneToMany(mappedBy="user")
     @JsonManagedReference
     private List<Role> roles = new ArrayList<>();
+    
+    
+    public void addRole(Role role){
+        roles.add(role);
+        role.setUser(this);
+    }
+    
+    public void removeRole(Role r){
+        roles.remove(r);
+        r.setUser(null);
+    }
 }

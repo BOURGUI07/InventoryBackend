@@ -64,6 +64,10 @@ public class StockMvmService {
     
     @Transactional
     public StockMvmDTO update(StockMvmDTO x, Integer id){
+        Set<ConstraintViolation<StockMvmDTO>> violations = validator.validate(x);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
         var s = repo.findById(id).orElse(null);
         if(s!=null){
             s.setDestinationLocation(x.destination());
