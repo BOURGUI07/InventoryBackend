@@ -41,9 +41,9 @@ public class CategoryService {
     }
     @PersistenceContext
     private EntityManager em;
-    private CategoryMapper mapper;
-    private CategRepo repo;
-    private ProductRepo productRepo;
+    private final CategoryMapper mapper;
+    private final CategRepo repo;
+    private final ProductRepo productRepo;
     private Validator validator;
     
     @Transactional

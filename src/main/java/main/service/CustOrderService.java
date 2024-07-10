@@ -45,10 +45,10 @@ public class CustOrderService {
     private Validator validator;
     @PersistenceContext
     private EntityManager em;
-    private CustOrderMapper mapper;
-    private CustOrderRepo repo;
-    private CustomerRepo custRepo;
-    private CustOrderDetailRepo detailRepo;
+    private final CustOrderMapper mapper;
+    private final CustOrderRepo repo;
+    private final CustomerRepo custRepo;
+    private final CustOrderDetailRepo detailRepo;
     
     public CustOrderDTO findByCode(String code){
         var q = "SELECT * FROM cust_order WHERE order_code= :x";

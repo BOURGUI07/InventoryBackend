@@ -43,10 +43,10 @@ public class CompanyService {
     }
     @PersistenceContext
     private EntityManager em;
-    private CompanyMapper mapper;
-    private CompanyRepo repo;
-    private UserRepo userRepo;
-    private ProductRepo productRepo;
+    private final CompanyMapper mapper;
+    private final CompanyRepo repo;
+    private final UserRepo userRepo;
+    private final ProductRepo productRepo;
     private Validator validator;
     
     public CompanyDTO findByName(String name){

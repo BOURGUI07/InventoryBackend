@@ -45,7 +45,7 @@ public class Supplier extends BaseEntity{
         o.setSupplier(this);
     }
     
-    public void removeorder(SuppOrder o){
+    public void removeOrder(SuppOrder o){
         suppOrders.remove(o);
         o.setSupplier(null);
     }

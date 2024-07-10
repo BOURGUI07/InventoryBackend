@@ -47,13 +47,13 @@ public class ProductService {
     public void setValidator(Validator validator) {
         this.validator = validator;
     }
-    private ProductMapper mapper;
-    private ProductRepo productRepo;
-    private CategRepo categoryRepo;
-    private CompanyRepo repo;
-    private CustOrderDetailRepo custRepo;
-    private StockMvmRepo stockRepo;
-    private SalesDetailRepo salesRepo;
+    private final ProductMapper mapper;
+    private final ProductRepo productRepo;
+    private final CategRepo categoryRepo;
+    private final CompanyRepo repo;
+    private final CustOrderDetailRepo custRepo;
+    private final StockMvmRepo stockRepo;
+    private final SalesDetailRepo salesRepo;
     private Validator validator;
     @PersistenceContext
     private EntityManager em;

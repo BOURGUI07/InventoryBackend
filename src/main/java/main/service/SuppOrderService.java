@@ -45,10 +45,10 @@ public class SuppOrderService {
     private Validator validator;
     @PersistenceContext
     private EntityManager em;
-    private SuppOrderMapper mapper;
-    private SuppOrderRepo repo;
-    private SupplierRepo suppRepo;
-    private SuppOrderDetailRepo detailRepo;
+    private final SuppOrderMapper mapper;
+    private final SuppOrderRepo repo;
+    private final SupplierRepo suppRepo;
+    private final SuppOrderDetailRepo detailRepo;
     
     public SuppOrderDTO findByCode(String code){
         var q = "SELECT * FROM supp_order WHERE order_code= :x";
