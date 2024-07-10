@@ -24,11 +24,16 @@ public class StockMvmMapper {
     
     public StockMvm toEntity(StockMvmDTO x){
         var s = new StockMvm();
+        s.setDestinationLocation(x.destination());
+        s.setMovementDate(x.date());
+        s.setMovementType(x.type());
+        s.setSourceLocation(x.source());
+        s.setQty(x.qty());
         s.setProduct(repo.findById(x.productId()).orElse(null));
         return s;
     }
     
     public StockMvmDTO toDTO(StockMvm s){
-        return new StockMvmDTO(s.getId(),s.getProduct().getId());
+        return new StockMvmDTO(s.getId(),s.getQty(),s.getMovementType(),s.getMovementDate(),s.getSourceLocation(),s.getDestinationLocation(), s.getProduct().getId());
     }
 }

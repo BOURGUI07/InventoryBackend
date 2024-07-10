@@ -118,6 +118,11 @@ create table supp_order_detail(
 drop table if exists stock_mvm;
 create table stock_mvm(
 	stock_id integer auto_increment primary key,
+    quantity integer not null,
+    movement_type varchar(50) NOT NULL CHECK (movement_type IN ('INBOUND', 'OUTBOUND')),
+    movement_date timestamp,
+    source_location varchar(50),
+    destination_location varchar(50),
     product_id integer not null,
     foreign key(product_id) references product(product_id)
 );
