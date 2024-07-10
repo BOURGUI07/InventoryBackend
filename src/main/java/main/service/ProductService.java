@@ -12,12 +12,15 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import main.dto.ProductDTO;
+import main.dto.StockMvmDTO;
 import main.entity.Product;
 import main.mapper.ProductMapper;
+import main.mapper.StockMvmMapper;
 import main.repo.CategRepo;
 import main.repo.CompanyRepo;
 import main.repo.CustOrderDetailRepo;
@@ -34,7 +37,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductService {
     @Autowired
-    public ProductService(ProductMapper mapper, ProductRepo productRepo, CategRepo categoryRepo, CompanyRepo repo, CustOrderDetailRepo custRepo, StockMvmRepo stockRepo, SalesDetailRepo salesRepo) {
+    public ProductService(ProductMapper mapper, ProductRepo productRepo, CategRepo categoryRepo, CompanyRepo repo, CustOrderDetailRepo custRepo, StockMvmRepo stockRepo, SalesDetailRepo salesRepo, StockMvmMapper mapper1) {
         this.mapper = mapper;
         this.productRepo = productRepo;
         this.categoryRepo = categoryRepo;
@@ -42,6 +45,7 @@ public class ProductService {
         this.custRepo = custRepo;
         this.stockRepo = stockRepo;
         this.salesRepo = salesRepo;
+        this.mapper1 = mapper1;
     }
 
     public void setValidator(Validator validator) {
@@ -54,6 +58,7 @@ public class ProductService {
     private final CustOrderDetailRepo custRepo;
     private final StockMvmRepo stockRepo;
     private final SalesDetailRepo salesRepo;
+    private final StockMvmMapper mapper1;
     private Validator validator;
     @PersistenceContext
     private EntityManager em;
@@ -148,4 +153,26 @@ public class ProductService {
     public List<ProductDTO> findAll(){
         return productRepo.findAll().stream().map(x -> mapper.toDTO(x)).collect(Collectors.toList());
     }
+    
+    //Implement a method to search for products with multiple filters like name, category, price range, etc.
+    public List<ProductDTO> searchProducts(String name, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice){
+        return productRepo.findAll().stream().filter(p -> 
+                p.getName().equals(name) 
+                && p.getCateg().getId().equals(categoryId)
+                && p.getPrice().compareTo(maxPrice)<=0
+                && p.getPrice().compareTo(minPrice)>=0).map(mapper::toDTO).collect(Collectors.toList());       
+        
+    }
+    
+    //Implement a method to retrieve the history of stock movements for a given product.
+    public List<StockMvmDTO> getProductStockHistory(Integer id){
+        var  p = productRepo.findById(id).orElse(null);
+        if(p!=null){
+            return p.getStockMvms().stream().map(mapper1::toDTO).collect(Collectors.toList());
+        }
+        return null;
+    }
+    
+    
+
 }
