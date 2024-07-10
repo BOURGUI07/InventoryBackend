@@ -42,4 +42,14 @@ public class Sales extends BaseEntity{
     
     @Column(name="sales_code")
     private String code;
+    
+    public void addDetail(SalesDetail x){
+        salesDetails.add(x);
+        x.setSales(this);
+    }
+    
+    public void removeDetail(SalesDetail x){
+        salesDetails.remove(x);
+        x.setSales(null);
+    }
 }
