@@ -22,6 +22,8 @@ import main.repo.CompanyRepo;
 import main.repo.ProductRepo;
 import main.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,9 +51,10 @@ public class CompanyService {
     private final ProductRepo productRepo;
     private Validator validator;
     
+    @Cacheable(value="CompanyByName", key="#name")
     public CompanyDTO findByName(String name){
         var q = "SELECT * FROM company WHERE company_name= :x";
-        Company c =  (Company)em.createNativeQuery(q, Company.class).setHint("x", name).getSingleResult();
+        Company c =  (Company)em.createNativeQuery(q, Company.class).setParameter("x", name).getSingleResult();
         try{
             return mapper.toDTO(c);
         }catch(NoResultException e){
@@ -61,6 +64,7 @@ public class CompanyService {
         }
     }
     
+    @Cacheable(value="CompanyById", key="#id")
     public CompanyDTO findById(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -69,11 +73,13 @@ public class CompanyService {
         return null;
     }
     
+    @Cacheable(value="AllCompanies", key="#root.methodName")
     public List<CompanyDTO> findAll(){
         return repo.findAll().stream().map(x -> mapper.toDTO(x)).collect(Collectors.toList());
     }
     
     @Transactional
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public CompanyDTO create(CompanyDTO x){
         Set<ConstraintViolation<CompanyDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -85,6 +91,7 @@ public class CompanyService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public CompanyDTO update(Integer id,CompanyDTO x){
         Set<ConstraintViolation<CompanyDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -106,6 +113,7 @@ public class CompanyService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public void delete(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -124,6 +132,7 @@ public class CompanyService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public void addProductToCompany(Integer companyId, Integer productId){
         var c = repo.findById(companyId).orElse(null);
         if(c!=null){
@@ -137,6 +146,7 @@ public class CompanyService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public void removeProductFromCompany(Integer companyid, Integer productId){
         var c = repo.findById(companyid).orElse(null);
         if(c!=null){
@@ -150,6 +160,7 @@ public class CompanyService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public void addUserToCompany(Integer companyId, Integer userid){
         var c = repo.findById(companyId).orElse(null);
         if(c!=null){
@@ -163,6 +174,7 @@ public class CompanyService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public void removeUserFromCompany(Integer companyid, Integer userid){
         var c = repo.findById(companyid).orElse(null);
         if(c!=null){
@@ -173,5 +185,10 @@ public class CompanyService {
                 userRepo.save(u);
             }
         }
+    }
+    
+    @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

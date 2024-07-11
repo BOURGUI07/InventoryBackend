@@ -18,6 +18,8 @@ import main.repo.CompanyRepo;
 import main.repo.RoleRepo;
 import main.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,6 +46,7 @@ public class UserService {
     private Validator validator;
     
     @Transactional
+    @CacheEvict(value={"UserById", "AllUsers"}, allEntries=true)
     public UserDTO create(UserDTO x){
         Set<ConstraintViolation<UserDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -55,6 +58,7 @@ public class UserService {
     }
     
     @Transactional
+    @CacheEvict(value={"UserById", "AllUsers"}, allEntries=true)
     public UserDTO update(Integer id, UserDTO x){
         Set<ConstraintViolation<UserDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -80,6 +84,7 @@ public class UserService {
     }
     
     @Transactional
+    @CacheEvict(value={"UserById", "AllUsers"}, allEntries=true)
     public void delete(Integer id){
         var u = repo.findById(id).orElse(null);
         if(u!=null){
@@ -92,6 +97,7 @@ public class UserService {
         }
     }
     
+    @Cacheable(value="UserById", key="#id")
     public UserDTO findById(Integer id){
         var u = repo.findById(id).orElse(null);
         if(u!=null){
@@ -100,7 +106,13 @@ public class UserService {
         return null;
     }
     
+    @Cacheable(value="AllUsers", key="#root.methodName")
     public List<UserDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+    }
+    
+    @CacheEvict(value={"UserById", "AllUsers"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

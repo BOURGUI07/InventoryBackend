@@ -28,6 +28,8 @@ import main.repo.ProductRepo;
 import main.repo.SalesDetailRepo;
 import main.repo.StockMvmRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -65,6 +67,7 @@ public class ProductService {
     
     
     @Transactional
+    @CacheEvict(value={"ProductById", "ProductByName", "AllProducts"}, allEntries=true)
     public ProductDTO createProduct(ProductDTO x){
         Set<ConstraintViolation<ProductDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -76,6 +79,7 @@ public class ProductService {
     }
     
     @Transactional
+    @CacheEvict(value={"ProductById", "ProductByName", "AllProducts"}, allEntries=true)
     public ProductDTO updateProduct(Integer id, ProductDTO x){
         Set<ConstraintViolation<ProductDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -106,6 +110,7 @@ public class ProductService {
     }
     
     @Transactional
+    @CacheEvict(value={"ProductById", "ProductByName", "AllProducts"}, allEntries=true)
     public void deleteProduct(Integer id){
         var p = productRepo.findById(id).orElse(null);
         if(p!=null){
@@ -129,6 +134,7 @@ public class ProductService {
         }
     } 
     
+    @Cacheable(value="ProductByName", key="#name")
     public ProductDTO findByName(String name){
         var q = "SELECT * FROM product WHERE product_name= :x";
         try{
@@ -140,6 +146,7 @@ public class ProductService {
         }
     }
     
+    @Cacheable(value="ProductById", key="#id")
     public ProductDTO findByid(Integer id){
         var p = productRepo.findById(id).orElse(null);
         if(p!=null){
@@ -148,6 +155,7 @@ public class ProductService {
         return null;
     }
     
+    @Cacheable(value="AllProducts", key="#root.methodName")
     public List<ProductDTO> findAll(){
         return productRepo.findAll().stream().map(x -> mapper.toDTO(x)).collect(Collectors.toList());
     }
@@ -171,6 +179,9 @@ public class ProductService {
         return null;
     }
     
-    
+    @CacheEvict(value={"ProductById", "ProductByName", "AllProducts"}, allEntries=true)
+    public void clearCache(){
+        
+    }
 
 }

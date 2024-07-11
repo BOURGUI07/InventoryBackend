@@ -22,6 +22,8 @@ import main.mapper.SalesMapper;
 import main.repo.SalesDetailRepo;
 import main.repo.SalesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -48,6 +50,7 @@ public class SalesService {
     private Validator validator;
     
     @Transactional
+    @CacheEvict(value={"SalesById", "SalesByCode", "AllSales"}, allEntries=true)
     public SalesDTO create(SalesDTO x){
         Set<ConstraintViolation<SalesDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -59,6 +62,7 @@ public class SalesService {
     }
     
     @Transactional
+    @CacheEvict(value={"SalesById", "SalesByCode", "AllSales"}, allEntries=true)
     public SalesDTO update(Integer id, SalesDTO x){
         Set<ConstraintViolation<SalesDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -77,6 +81,7 @@ public class SalesService {
     }
     
     @Transactional
+    @CacheEvict(value={"SalesById", "SalesByCode", "AllSales"}, allEntries=true)
     public void addDetail(Integer id, Integer productid){
         var s = repo.findById(id).orElse(null);
         var detailid = new SalesDetailId(productid, id);
@@ -91,6 +96,7 @@ public class SalesService {
     }
     
     @Transactional
+    @CacheEvict(value={"SalesById", "SalesByCode", "AllSales"}, allEntries=true)
     public void removeDetail(Integer id, Integer productid){
         var s = repo.findById(id).orElse(null);
         var detailid = new SalesDetailId(productid, id);
@@ -105,6 +111,7 @@ public class SalesService {
     }
     
     @Transactional
+    @CacheEvict(value={"SalesById", "SalesByCode", "AllSales"}, allEntries=true)
     public void delete(Integer id){
         var s = repo.findById(id).orElse(null);
         if(s!=null){
@@ -117,6 +124,7 @@ public class SalesService {
         }
     }
     
+    @Cacheable(value="SalesById", key="#id")
     public SalesDTO findById(Integer id){
         var s = repo.findById(id).orElse(null);
         if(s!=null){
@@ -125,10 +133,12 @@ public class SalesService {
         return null;
     }
     
+    @Cacheable(value="AllSales", key="#root.methodName")
     public List<SalesDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
     
+    @Cacheable(value="SalesByCode", key="#code")
     public SalesDTO findByCode(String code){
         var q = "SELECT * FROM sales WHERE sales_code= :x";
         try{
@@ -138,5 +148,10 @@ public class SalesService {
         }catch(NonUniqueResultException e){
             return null;
         }
+    }
+    
+    @CacheEvict(value={"SalesById", "SalesByCode", "AllSales"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

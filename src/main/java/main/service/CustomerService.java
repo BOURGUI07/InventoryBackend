@@ -21,6 +21,8 @@ import main.mapper.CustomerMapper;
 import main.repo.CustOrderRepo;
 import main.repo.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,6 +48,7 @@ public class CustomerService {
     private final CustOrderRepo orderRepo;
     private Validator validator;
     
+    @Cacheable(value="CustomerById", key="#id")
     public CustomerDTO findById(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -54,6 +57,7 @@ public class CustomerService {
         return null;
     }
     
+    @Cacheable(value="CustomerByFirstOrLastName", key="{#firstName , #lastName}")
     public CustomerDTO findByFirstOrLastName(String firstName, String lastName){
         var q = "SELECT * FROM customer WHERE firstname= :first OR lastname= :last";
         var c =(Customer) em.createNativeQuery(q, Customer.class).setParameter("first", firstName).setParameter("last",lastName).getSingleResult();
@@ -66,11 +70,18 @@ public class CustomerService {
         }
     }
     
+    @Cacheable(value="AllCustomers", key="#root.methodName")
     public List<CustomerDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
     
+    @CacheEvict(value={"AllCustomers","CustomerByFirstOrLastName","CustomerById"}, allEntries=true)
+    public void clearCache(){
+        
+    }
+    
     @Transactional
+    @CacheEvict(value={"AllCustomers","CustomerByFirstOrLastName","CustomerById"}, allEntries=true)
     public void addOrder(Integer id, Integer orderid){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -84,6 +95,7 @@ public class CustomerService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCustomers","CustomerByFirstOrLastName","CustomerById"}, allEntries=true)
     public void removeOrder(Integer id, Integer orderid){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -97,6 +109,7 @@ public class CustomerService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCustomers","CustomerByFirstOrLastName","CustomerById"}, allEntries=true)
     public void delete(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -110,6 +123,7 @@ public class CustomerService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCustomers","CustomerByFirstOrLastName","CustomerById"}, allEntries=true)
     public CustomerDTO create(CustomerDTO x){
         Set<ConstraintViolation<CustomerDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -121,6 +135,7 @@ public class CustomerService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllCustomers","CustomerByFirstOrLastName","CustomerById"}, allEntries=true)
     public CustomerDTO update(Integer id ,CustomerDTO x){
         Set<ConstraintViolation<CustomerDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {

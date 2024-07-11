@@ -22,6 +22,8 @@ import main.mapper.SupplierMapper;
 import main.repo.SuppOrderRepo;
 import main.repo.SupplierRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,6 +49,7 @@ public class SupplierService {
     private final SuppOrderRepo orderRepo;
     private Validator validator;
     
+    @Cacheable(value = "SupplierById", key = "#id")
     public SupplierDTO findById(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -55,6 +58,7 @@ public class SupplierService {
         return null;
     }
     
+    @Cacheable(value = "supplierByFirstOrLastName", key = "{#firstName, #lastName}")
     public SupplierDTO findByFirstOrLastName(String firstName, String lastName){
         var q = "SELECT * FROM supplier WHERE firstname= :first OR lastname= :last";
         var c =(Supplier) em.createNativeQuery(q, Customer.class).setParameter("first", firstName).setParameter("last",lastName).getSingleResult();
@@ -67,11 +71,13 @@ public class SupplierService {
         }
     }
     
+    @Cacheable(value = "AllSuppliers", key = "#root.methodName")
     public List<SupplierDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
     
     @Transactional
+    @CacheEvict(value={"AllSuppliers","supplierByFirstOrLastName","SupplierById"}, allEntries=true)
     public void addOrder(Integer id, Integer orderid){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -85,6 +91,7 @@ public class SupplierService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllSuppliers","supplierByFirstOrLastName","SupplierById"}, allEntries=true)
     public void removeOrder(Integer id, Integer orderid){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -98,6 +105,7 @@ public class SupplierService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllSuppliers","supplierByFirstOrLastName","SupplierById"}, allEntries=true)
     public void delete(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -111,6 +119,7 @@ public class SupplierService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllSuppliers","supplierByFirstOrLastName","SupplierById"}, allEntries=true)
     public SupplierDTO create(SupplierDTO x){
         Set<ConstraintViolation<SupplierDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -122,6 +131,7 @@ public class SupplierService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllSuppliers","supplierByFirstOrLastName","SupplierById"}, allEntries=true)
     public SupplierDTO update(Integer id ,SupplierDTO x){
         Set<ConstraintViolation<SupplierDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -142,5 +152,10 @@ public class SupplierService {
             return mapper.toDTO(s);
         }
         return null;
+    }
+    
+    @CacheEvict(value={"AllSuppliers","supplierByFirstOrLastName","SupplierById"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

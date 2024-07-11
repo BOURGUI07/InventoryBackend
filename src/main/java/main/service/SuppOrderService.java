@@ -23,6 +23,8 @@ import main.repo.SuppOrderDetailRepo;
 import main.repo.SuppOrderRepo;
 import main.repo.SupplierRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,6 +52,7 @@ public class SuppOrderService {
     private final SupplierRepo suppRepo;
     private final SuppOrderDetailRepo detailRepo;
     
+    @Cacheable(value="OrderByCode", key="#code")
     public SuppOrderDTO findByCode(String code){
         var q = "SELECT * FROM supp_order WHERE order_code= :x";
         var o =  (SuppOrder)em.createNativeQuery(q, SuppOrder.class).setHint("x", code).getSingleResult();
@@ -62,6 +65,7 @@ public class SuppOrderService {
         }
     }
     
+    @Cacheable(value="OrderById", key="#id")
     public SuppOrderDTO findById(Integer id){
         var o = repo.findById(id).orElse(null);
         if(o!=null){
@@ -70,11 +74,13 @@ public class SuppOrderService {
         return null;
     }
     
+    @Cacheable(value="AllOrders", key="#root.methodName")
     public List<SuppOrderDTO> findAll(){
         return repo.findAll().stream().map(x -> mapper.toDTO(x)).collect(Collectors.toList());
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public SuppOrderDTO create(SuppOrderDTO x){
         Set<ConstraintViolation<SuppOrderDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -86,6 +92,7 @@ public class SuppOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public SuppOrderDTO update(Integer id, SuppOrderDTO x){
         Set<ConstraintViolation<SuppOrderDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -106,6 +113,7 @@ public class SuppOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public void delete(Integer id){
         var o = repo.findById(id).orElse(null);
         if(o!=null){
@@ -119,6 +127,7 @@ public class SuppOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public void adddetailToOrder(Integer orderid, Integer productId){
         var detailId = new SuppOrderDetailId(productId,orderid);
         var o = repo.findById(orderid).orElse(null);
@@ -133,6 +142,7 @@ public class SuppOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public void removeDetailFromOrder(Integer orderid, Integer productId){
         var detailId = new SuppOrderDetailId(productId,orderid);
         var o = repo.findById(orderid).orElse(null);
@@ -144,5 +154,10 @@ public class SuppOrderService {
                 detailRepo.save(detail);
             }
         }
+    }
+    
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

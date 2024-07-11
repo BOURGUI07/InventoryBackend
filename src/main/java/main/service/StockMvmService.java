@@ -16,6 +16,8 @@ import main.mapper.StockMvmMapper;
 import main.repo.ProductRepo;
 import main.repo.StockMvmRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,6 +41,7 @@ public class StockMvmService {
     private final ProductRepo productRepo;
     private Validator validator;
     
+    @Cacheable(value="StockById", key="#id")
     public StockMvmDTO findById(Integer id){
         var s = repo.findById(id).orElse(null);
         if(s!=null){
@@ -47,11 +50,13 @@ public class StockMvmService {
         return null;
     }
     
+    @Cacheable(value="AllStocks", key="#root.methodName")
     public List<StockMvmDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
     
     @Transactional
+    @CacheEvict(value={"AllStocks", "StockById"}, allEntries=true)
     public StockMvmDTO create(StockMvmDTO x){
         Set<ConstraintViolation<StockMvmDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -63,6 +68,7 @@ public class StockMvmService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllStocks", "StockById"}, allEntries=true)
     public StockMvmDTO update(StockMvmDTO x, Integer id){
         Set<ConstraintViolation<StockMvmDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -83,9 +89,15 @@ public class StockMvmService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllStocks", "StockById"}, allEntries=true)
     public void delete(Integer id){
         if(this.findById(id)!=null){
             repo.deleteById(id);
         }
+    }
+    
+    @CacheEvict(value={"AllStocks", "StockById"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

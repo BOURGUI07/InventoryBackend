@@ -21,6 +21,8 @@ import main.mapper.CategoryMapper;
 import main.repo.CategRepo;
 import main.repo.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -47,6 +49,7 @@ public class CategoryService {
     private Validator validator;
     
     @Transactional
+    @CacheEvict(value={"CategoryById","AllCategories","CategoryByName"}, allEntries=true)
     public CategoryDTO create(CategoryDTO x){
         Set<ConstraintViolation<CategoryDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -58,6 +61,7 @@ public class CategoryService {
     }
     
     @Transactional
+    @CacheEvict(value={"CategoryById","AllCategories","CategoryByName"}, allEntries=true)
     public CategoryDTO update(Integer id, CategoryDTO x){
         Set<ConstraintViolation<CategoryDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -77,6 +81,7 @@ public class CategoryService {
     }
     
     @Transactional
+    @CacheEvict(value={"CategoryById","AllCategories","CategoryByName"}, allEntries=true)
     public void delete(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -90,6 +95,7 @@ public class CategoryService {
     }
     
     @Transactional
+    @CacheEvict(value={"CategoryById","AllCategories","CategoryByName"}, allEntries=true)
     public void addProductToCateg(Integer categId, Integer productId){
         var c = repo.findById(categId).orElse(null);
         if(c!=null){
@@ -104,6 +110,7 @@ public class CategoryService {
     
     
     @Transactional
+    @CacheEvict(value={"CategoryById","AllCategories","CategoryByName"}, allEntries=true)
     public void removeProductFromCateg(Integer categId, Integer productId){
         var c = repo.findById(categId).orElse(null);
         if(c!=null){
@@ -116,7 +123,7 @@ public class CategoryService {
         }
     }
     
-    
+    @Cacheable(value="CategoryById", key="#id")
     public CategoryDTO findById(Integer id){
         var c = repo.findById(id).orElse(null);
         if(c!=null){
@@ -125,10 +132,12 @@ public class CategoryService {
         return null;
     }
     
+    @Cacheable(value="AllCategories", key="#root.methodName")
     public List<CategoryDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
     }
     
+    @Cacheable(value="CategoryByName", key="#name")
     public CategoryDTO findByName(String name){
         var q = "SELECT * FROM category WHERE category_name= :x";
         Category c =  (Category)em.createNativeQuery(q, Category.class).setHint("x", name).getSingleResult();
@@ -141,5 +150,7 @@ public class CategoryService {
         }
     }
     
-    
+    @CacheEvict(value={"CategoryById","AllCategories","CategoryByName"}, allEntries=true)
+    public void clearCache(){
+    }
 }

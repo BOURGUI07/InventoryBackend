@@ -18,6 +18,8 @@ import main.repo.ProductRepo;
 import main.repo.SalesDetailRepo;
 import main.repo.SalesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,6 +46,7 @@ public class SalesDetailService {
     private Validator validator;
     
     @Transactional
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
     public SalesDetailDTO create(SalesDetailDTO x){
         Set<ConstraintViolation<SalesDetailDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -55,6 +58,7 @@ public class SalesDetailService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
     public SalesDetailDTO update(Integer productid, Integer salesid,SalesDetailDTO x ){
         var id = new SalesDetailId(productid, salesid);
         var d = repo.findById(id).orElse(null);
@@ -69,6 +73,7 @@ public class SalesDetailService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
     public void delete(Integer productid, Integer salesid){
         var id = new SalesDetailId(productid, salesid);
         var d = repo.findById(id).orElse(null);
@@ -77,6 +82,7 @@ public class SalesDetailService {
         }
     }
     
+    @Cacheable(value="DetailById", key="{#productid ,#salesid}")
     public SalesDetailDTO findById(Integer productid, Integer salesid){
         var id = new SalesDetailId(productid, salesid);
         var d = repo.findById(id).orElse(null);
@@ -86,7 +92,13 @@ public class SalesDetailService {
         return null;
     }
     
+    @Cacheable(value="AllDetails", key="#root.methodName")
     public List<SalesDetailDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+    }
+    
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

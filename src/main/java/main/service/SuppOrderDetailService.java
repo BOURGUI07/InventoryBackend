@@ -18,6 +18,8 @@ import main.repo.ProductRepo;
 import main.repo.SuppOrderDetailRepo;
 import main.repo.SuppOrderRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -43,6 +45,7 @@ public class SuppOrderDetailService {
     private Validator validator;
     
     @Transactional
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
     public SuppOrderDetailDTO create(SuppOrderDetailDTO x){
         Set<ConstraintViolation<SuppOrderDetailDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -54,6 +57,7 @@ public class SuppOrderDetailService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
     public SuppOrderDetailDTO update(Integer productid, Integer salesid,SuppOrderDetailDTO x ){
         var id = new SuppOrderDetailId(productid, salesid);
         var d = repo.findById(id).orElse(null);
@@ -68,6 +72,7 @@ public class SuppOrderDetailService {
     }
     
     @Transactional
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
     public void delete(Integer productid, Integer salesid){
         var id = new SuppOrderDetailId(productid, salesid);
         var d = repo.findById(id).orElse(null);
@@ -76,6 +81,7 @@ public class SuppOrderDetailService {
         }
     }
     
+    @Cacheable(value="DetailById", key="{#productid ,#salesid}")
     public SuppOrderDetailDTO findById(Integer productid, Integer salesid){
         var id = new SuppOrderDetailId(productid, salesid);
         var d = repo.findById(id).orElse(null);
@@ -85,7 +91,13 @@ public class SuppOrderDetailService {
         return null;
     }
     
+    @Cacheable(value="AllDetails", key="#root.methodName")
     public List<SuppOrderDetailDTO> findAll(){
         return repo.findAll().stream().map(mapper::toDTO).collect(Collectors.toList());
+    }
+    
+    @CacheEvict(value={"AllDetails", "DetailById"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }

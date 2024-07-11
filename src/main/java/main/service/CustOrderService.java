@@ -23,6 +23,8 @@ import main.repo.CustOrderDetailRepo;
 import main.repo.CustOrderRepo;
 import main.repo.CustomerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,6 +52,7 @@ public class CustOrderService {
     private final CustomerRepo custRepo;
     private final CustOrderDetailRepo detailRepo;
     
+    @Cacheable(value="OrderByCode", key="#code")
     public CustOrderDTO findByCode(String code){
         var q = "SELECT * FROM cust_order WHERE order_code= :x";
         var o =  (CustOrder)em.createNativeQuery(q, CustOrder.class).setHint("x", code).getSingleResult();
@@ -62,6 +65,7 @@ public class CustOrderService {
         }
     }
     
+    @Cacheable(value="OrderById", key="#id")
     public CustOrderDTO findById(Integer id){
         var o = repo.findById(id).orElse(null);
         if(o!=null){
@@ -70,11 +74,13 @@ public class CustOrderService {
         return null;
     }
     
+    @Cacheable(value="AllOrders", key="#root.methodName")
     public List<CustOrderDTO> findAll(){
         return repo.findAll().stream().map(x -> mapper.toDTO(x)).collect(Collectors.toList());
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public CustOrderDTO create(CustOrderDTO x){
         Set<ConstraintViolation<CustOrderDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -86,6 +92,7 @@ public class CustOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public CustOrderDTO update(Integer id, CustOrderDTO x){
         Set<ConstraintViolation<CustOrderDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
@@ -106,6 +113,7 @@ public class CustOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public void delete(Integer id){
         var o = repo.findById(id).orElse(null);
         if(o!=null){
@@ -119,6 +127,7 @@ public class CustOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public void adddetailToOrder(Integer orderid, Integer productId){
         var detailId = new CustOrderDetailId(productId,orderid);
         var o = repo.findById(orderid).orElse(null);
@@ -133,6 +142,7 @@ public class CustOrderService {
     }
     
     @Transactional
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
     public void removeDetailFromOrder(Integer orderid, Integer productId){
         var detailId = new CustOrderDetailId(productId,orderid);
         var o = repo.findById(orderid).orElse(null);
@@ -144,5 +154,9 @@ public class CustOrderService {
                 detailRepo.save(detail);
             }
         }
+    }
+    @CacheEvict(value={"OrderById","AllOrders","OrderByCode"}, allEntries=true)
+    public void clearCache(){
+        
     }
 }
