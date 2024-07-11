@@ -27,8 +27,6 @@ public record ProductDTO(
         String desc,
         @NotBlank(message = "Product Price is Mandatory")
         BigDecimal price,
-        BigDecimal vatRate,
-        BigDecimal priceTTC,
         String pic,
         @NotNull(message="CategoryId can't be null. Product has to belong to a category")
         Integer categoryId,

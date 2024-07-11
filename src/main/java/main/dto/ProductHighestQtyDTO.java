@@ -4,10 +4,15 @@
  */
 package main.dto;
 
+import lombok.AllArgsConstructor;
+
 /**
  *
  * @author hp
  */
-public class SalesReportDTO {
-    
+@AllArgsConstructor
+public class ProductHighestQtyDTO {
+    private Integer id;
+    private String name;
+    private int salesQty;
 }

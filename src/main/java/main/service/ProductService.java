@@ -90,8 +90,6 @@ public class ProductService {
             p.setName(x.name());
             p.setPic(x.pic());
             p.setPrice(x.price());
-            p.setPriceTTC(x.priceTTC());
-            p.setVatRate(x.vatRate());
             if(x.custOrderDetailIds()!=null){
                 p.setCustOrderDetails(custRepo.findAllById(x.custOrderDetailIds()));
             }

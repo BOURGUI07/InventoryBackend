@@ -46,8 +46,6 @@ public class ProductMapper {
         p.setName(x.name());
         p.setPic(x.pic());
         p.setPrice(x.price());
-        p.setPriceTTC(x.priceTTC());
-        p.setVatRate(x.vatRate());
         if(x.stockMvmIds()!=null){
             p.setStockMvms(stockRepo.findAllById(x.stockMvmIds()));
         }
@@ -73,8 +71,6 @@ public class ProductMapper {
                 p.getName(),
                 p.getDesc(),
                 p.getPrice(),
-                p.getVatRate(),
-                p.getPriceTTC(),
                 p.getPic(),
                 p.getCateg().getId(),
                 p.getCompany().getId(),

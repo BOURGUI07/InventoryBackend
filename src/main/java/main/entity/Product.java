@@ -50,11 +50,6 @@ public class Product extends BaseEntity{
     @Column(name="price")
     private BigDecimal price;
     
-    @Column(name="vat_rate")
-    private BigDecimal vatRate;
-    
-    @Column(name="price_ttc")
-    private BigDecimal priceTTC;
     
     @Column(name="pic")
     private String pic;
