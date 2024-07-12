@@ -68,7 +68,7 @@ public class ProductService {
     
     @Transactional
     @CacheEvict(value={"ProductById", "ProductByName", "AllProducts"}, allEntries=true)
-    public ProductDTO createProduct(ProductDTO x){
+    public ProductDTO create(ProductDTO x){
         Set<ConstraintViolation<ProductDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -80,7 +80,7 @@ public class ProductService {
     
     @Transactional
     @CacheEvict(value={"ProductById", "ProductByName", "AllProducts"}, allEntries=true)
-    public ProductDTO updateProduct(Integer id, ProductDTO x){
+    public ProductDTO update(Integer id, ProductDTO x){
         Set<ConstraintViolation<ProductDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
@@ -111,7 +111,7 @@ public class ProductService {
     
     @Transactional
     @CacheEvict(value={"ProductById", "ProductByName", "AllProducts"}, allEntries=true)
-    public void deleteProduct(Integer id){
+    public void delete(Integer id){
         var p = productRepo.findById(id).orElse(null);
         if(p!=null){
             var list = p.getSalesDetails();
@@ -147,7 +147,7 @@ public class ProductService {
     }
     
     @Cacheable(value="ProductById", key="#id")
-    public ProductDTO findByid(Integer id){
+    public ProductDTO findById(Integer id){
         var p = productRepo.findById(id).orElse(null);
         if(p!=null){
             return mapper.toDTO(p);

@@ -35,15 +35,15 @@ public class Category extends BaseEntity{
     @Column(name="category_id")
     private Integer id;
     
-    @OneToMany(mappedBy="categ")
-    @JsonManagedReference
-    private List<Product> products = new ArrayList<>();
-    
     @Column(name="category_name")
     private String name;
     
     @Column(name="description")
     private String desc;
+    
+    @OneToMany(mappedBy="categ")
+    @JsonManagedReference
+    private List<Product> products = new ArrayList<>();
     
     public void addProduct(Product p){
         products.add(p);
