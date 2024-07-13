@@ -69,7 +69,7 @@ public class StockMvmService {
     
     @Transactional
     @CacheEvict(value={"AllStocks", "StockById"}, allEntries=true)
-    public StockMvmDTO update(StockMvmDTO x, Integer id){
+    public StockMvmDTO update(Integer id,StockMvmDTO x){
         Set<ConstraintViolation<StockMvmDTO>> violations = validator.validate(x);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
