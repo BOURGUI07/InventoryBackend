@@ -98,10 +98,10 @@ public class ProductController {
     //GET /api/products/search?name=example&categoryId=1&minPrice=10.00&maxPrice=100.00
     @GetMapping("/products/search")
     public ResponseEntity<List<ProductDTO>> search(
-            @RequestParam String name,
-            @RequestParam Integer categoryId,
-            @RequestBody BigDecimal minPrice,
-            @RequestBody BigDecimal maxPrice
+            @RequestParam(required=false) String name,
+            @RequestParam(required=false) Integer categoryId,
+            @RequestParam(required=false) BigDecimal minPrice,
+            @RequestParam(required=false) BigDecimal maxPrice
     ){
         return ResponseEntity.ok(service.searchProducts(name, categoryId, minPrice, maxPrice));
     }

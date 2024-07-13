@@ -6,9 +6,9 @@ package main.controller;
 
 import jakarta.validation.Valid;
 import java.util.List;
-import main.dto.CompanyDTO;
+import main.dto.SupplierDTO;
 import main.handler.RessourceNotFoundException;
-import main.service.CompanyService;
+import main.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -27,22 +28,22 @@ import org.springframework.web.bind.annotation.RestController;
  * @author hp
  */
 @RestController
-@RequestMapping("/api/companies")
+@RequestMapping("/api/suppliers")
 @Validated
-public class CompanyController {
+public class SupplierController {
     @Autowired
-    public CompanyController(CompanyService service) {
+    public SupplierController(SupplierService service) {
         this.service = service;
     }
-    private final CompanyService service;
+    private final SupplierService service;
     
     @GetMapping
-    public ResponseEntity<List<CompanyDTO>> findAll(){
+    public ResponseEntity<List<SupplierDTO>> findAll(){
         return ResponseEntity.ok(service.findAll());
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<CompanyDTO> findById(@PathVariable Integer id){
+    public ResponseEntity<SupplierDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
@@ -52,25 +53,21 @@ public class CompanyController {
         return ResponseEntity.ok(service.findById(id));
     }
     
-    @GetMapping("/{name}")
-    public ResponseEntity<CompanyDTO> findByName(@PathVariable String name){
-        var c = service.findByName(name);
-        if(name.isBlank()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-        if(c==null){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @GetMapping("/search")
+    public ResponseEntity<SupplierDTO> findByName(
+            @RequestParam(required=false) String firstname,
+            @RequestParam(required=false) String lastname){
+        var c = service.findByFirstOrLastName(firstname,lastname);
         return ResponseEntity.ok(c);
     }
     
     @PostMapping
-    public ResponseEntity<CompanyDTO> create(@Valid @RequestBody CompanyDTO x){
+    public ResponseEntity<SupplierDTO> create(@Valid @RequestBody SupplierDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<CompanyDTO> update(@PathVariable Integer id, @Valid @RequestBody CompanyDTO x){
+    public ResponseEntity<SupplierDTO> update(@PathVariable Integer id, @Valid @RequestBody SupplierDTO x){
         if(id<0 || id>=service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
@@ -80,27 +77,15 @@ public class CompanyController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
-    @PutMapping("/{companyid}/products/{productid}")
-    public ResponseEntity<Void> addProduct(@PathVariable Integer companyid, @PathVariable Integer productid){
-        service.addProductToCompany(companyid, productid);
+    @PutMapping("/{supplierid}/orders/{orderid}")
+    public ResponseEntity<Void> addOrder(@PathVariable Integer supplierid, @PathVariable Integer orderid){
+        service.addOrder(supplierid, orderid);
         return ResponseEntity.noContent().build();
     }
     
-    @DeleteMapping("/{companyid}/products/{productid}")
-    public ResponseEntity<Void> removeProduct(@PathVariable Integer companyid, @PathVariable Integer productid){
-        service.removeProductFromCompany(companyid, productid);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @PutMapping("/{companyid}/users/{userid}")
-    public ResponseEntity<Void> addUser(@PathVariable Integer companyid, @PathVariable Integer userid){
-        service.addUserToCompany(companyid, userid);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @DeleteMapping("/{companyid}/users/{userid}")
-    public ResponseEntity<Void> removeUser(@PathVariable Integer companyid, @PathVariable Integer userid){
-        service.removeUserFromCompany(companyid, userid);
+    @DeleteMapping("/{supplierid}/orders/{orderid}")
+    public ResponseEntity<Void> removeOrder(@PathVariable Integer supplierid, @PathVariable Integer orderid){
+        service.removeOrder(supplierid, orderid);
         return ResponseEntity.noContent().build();
     }
     
