@@ -166,8 +166,7 @@ public class ProductService {
                 p.getName().equals(name) 
                 && p.getCateg().getId().equals(categoryId)
                 && p.getPrice().compareTo(maxPrice)<=0
-                && p.getPrice().compareTo(minPrice)>=0).map(mapper::toDTO).collect(Collectors.toList());       
-        
+                && p.getPrice().compareTo(minPrice)>=0).map(mapper::toDTO).collect(Collectors.toList());          
     }
     
     //Implement a method to retrieve the history of stock movements for a given product.

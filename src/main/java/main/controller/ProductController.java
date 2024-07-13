@@ -5,10 +5,12 @@
 package main.controller;
 
 import jakarta.validation.Valid;
+import java.math.BigDecimal;
 import java.util.List;
-import main.dto.CategoryDTO;
+import main.dto.ProductDTO;
+import main.dto.StockMvmDTO;
 import main.handler.RessourceNotFoundException;
-import main.service.CategoryService;
+import main.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -29,20 +32,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @Validated
-public class CategoryController {
+public class ProductController {
     @Autowired
-    public CategoryController(CategoryService service) {
+    public ProductController(ProductService service) {
         this.service = service;
     }
-    private final CategoryService service;
+    private final ProductService service;
     
-    @GetMapping("/categories")
-    public ResponseEntity<List<CategoryDTO>> findAll(){
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductDTO>> findAll(){
         return ResponseEntity.ok(service.findAll());
     }
     
-    @GetMapping("/categories/{id}")
-    public ResponseEntity<CategoryDTO> findById(@PathVariable Integer id){
+    @GetMapping("/products/{id}")
+    public ResponseEntity<ProductDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
@@ -52,8 +55,8 @@ public class CategoryController {
         return ResponseEntity.ok(service.findById(id));
     }
     
-    @GetMapping("/categories/{name}")
-    public ResponseEntity<CategoryDTO> findByName(@PathVariable String name){
+    @GetMapping("/products/{name}")
+    public ResponseEntity<ProductDTO> findByName(@PathVariable String name){
         var c = service.findByName(name);
         if(name.isBlank()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -64,13 +67,13 @@ public class CategoryController {
         return ResponseEntity.ok(c);
     }
     
-    @PostMapping("/categories")
-    public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO x){
+    @PostMapping("/products")
+    public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
-    @PutMapping("/categories/{id}")
-    public ResponseEntity<CategoryDTO> update(@PathVariable Integer id, @Valid @RequestBody CategoryDTO x){
+    @PutMapping("/products/{id}")
+    public ResponseEntity<ProductDTO> update(@PathVariable Integer id, @Valid @RequestBody ProductDTO x){
         if(id<0 || id>=service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
@@ -80,19 +83,7 @@ public class CategoryController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
-    @PutMapping("/categories/{categoryid}/products/{productid}")
-    public ResponseEntity<Void> addProduct(@PathVariable Integer categoryid, @PathVariable Integer productid){
-        service.addProductToCateg(categoryid, productid);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @DeleteMapping("/categories/{categoryid}/products/{productid}")
-    public ResponseEntity<Void> removeProduct(@PathVariable Integer categoryid, @PathVariable Integer productid){
-        service.addProductToCateg(categoryid, productid);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @DeleteMapping("/categories/{id}")
+    @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
@@ -102,5 +93,27 @@ public class CategoryController {
         }
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    //GET /api/products/search?name=example&categoryId=1&minPrice=10.00&maxPrice=100.00
+    @GetMapping("/products/search")
+    public ResponseEntity<List<ProductDTO>> search(
+            @RequestParam String name,
+            @RequestParam Integer categoryId,
+            @RequestBody BigDecimal minPrice,
+            @RequestBody BigDecimal maxPrice
+    ){
+        return ResponseEntity.ok(service.searchProducts(name, categoryId, minPrice, maxPrice));
+    }
+    
+    @GetMapping("/products/stock/{id}")
+    public ResponseEntity<List<StockMvmDTO>> getproductHistory(@PathVariable Integer id){
+        if(id<0 || id>=service.findAll().size()){
+            throw new RessourceNotFoundException("Id non-valid");
+        }
+        if(service.findById(id)==null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.ok(service.getProductStockHistory(id));
     }
 }
