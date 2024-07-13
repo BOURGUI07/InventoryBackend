@@ -43,26 +43,6 @@ public class GlobalService {
     @PersistenceContext
     private EntityManager em;
     
-    
-    //Implement a method to search for products with multiple filters like name, category, price range, etc.
-    public List<ProductDTO> searchProducts(String name, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice){
-        return productRepo.findAll().stream().filter(p -> 
-                p.getName().equals(name) 
-                && p.getCateg().getId().equals(categoryId)
-                && p.getPrice().compareTo(maxPrice)<=0
-                && p.getPrice().compareTo(minPrice)>=0).map(mapper::toDTO).collect(Collectors.toList());       
-        
-    }
-    
-    //Implement a method to retrieve the history of stock movements for a given product.
-    public List<StockMvmDTO> getProductStockHistory(Integer id){
-        var  p = productRepo.findById(id).orElse(null);
-        if(p!=null){
-            return p.getStockMvms().stream().map(mapper1::toDTO).collect(Collectors.toList());
-        }
-        return null;
-    }
-    
     //Implement a method to provide statistics on the most popular products, best customers, etc.
     public List<PopularProductDTO> getMostPopularProducts(Instant startDate, Instant endDate){
         var q = "SELECT p.product_id, p.product_name, COUNT(d.cust_order_id) "
