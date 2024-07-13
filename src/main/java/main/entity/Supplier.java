@@ -36,9 +36,7 @@ public class Supplier extends BaseEntity{
     @Column(name="supplier_id")
     private Integer id;
     
-    @OneToMany(mappedBy="supplier")
-    @JsonManagedReference
-    private List<SuppOrder> suppOrders = new ArrayList<>();
+   
     
     public void addOrder(SuppOrder o){
         suppOrders.add(o);
@@ -67,4 +65,8 @@ public class Supplier extends BaseEntity{
     
     @Column(name="pic")
     private String pic;
+    
+    @OneToMany(mappedBy="supplier")
+    @JsonManagedReference
+    private List<SuppOrder> suppOrders = new ArrayList<>();
 }

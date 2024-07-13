@@ -7,13 +7,18 @@ package Inventory.Inv.unit_tests;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import main.dto.CategoryDTO;
+import main.dto.ProductDTO;
 import main.entity.Category;
 import main.entity.Company;
+import main.entity.CustOrderDetailId;
 import main.entity.Product;
+import main.entity.SalesDetailId;
+import main.entity.SuppOrderDetailId;
 import main.mapper.CategoryMapper;
 import main.repo.CategRepo;
 import main.repo.ProductRepo;
@@ -28,7 +33,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -53,12 +57,30 @@ public class CategoryServiceTest {
     
     private CategoryDTO x;
     private Category e = new Category();
+    
+    private Product p ;
+    private ProductDTO y;
     public CategoryServiceTest() {
         x= new CategoryDTO(1, "children", "children toys", new ArrayList<>());
         e.setId(1);
         e.setDesc("children toys");
         e.setProducts(new ArrayList<>());
         e.setName("children");
+        
+        
+        p =new Product();
+        y = new ProductDTO(1,"name", "desrip", new BigDecimal("123.540"), "", 1, 1, new ArrayList<Integer>(),new ArrayList<SalesDetailId>(),new ArrayList<CustOrderDetailId>(),new ArrayList<SuppOrderDetailId>());
+        p.setId(1);
+        p.setCustOrderDetails(new ArrayList<>());
+        p.setSuppOrderDetails(new ArrayList<>());
+        p.setStockMvms(new ArrayList<>());
+        p.setSalesDetails(new ArrayList<>());
+        p.setDesc("desrip");
+        p.setName("name");
+        p.setPic("");
+        p.setCompany(null);
+        p.setPrice(new BigDecimal("123.540"));
+        p.setCateg(null);
     }
        
     @BeforeEach
@@ -120,6 +142,19 @@ public class CategoryServiceTest {
             service.create(c1);
         });
    }
+   
+   @Test
+   void testAddRemoveProduct(){
+        when(productRepo.save(p)).thenReturn(p);
+        when(productRepo.findById(1)).thenReturn(Optional.of(p));
+        when(repo.findById(1)).thenReturn(Optional.of(e));
+        service.addProductToCateg(1, 1);
+        assertFalse(e.getProducts().isEmpty());
+        service.removeProductFromCateg(1, 1);
+        assertTrue(e.getProducts().isEmpty());
+   }
+   
+   
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //

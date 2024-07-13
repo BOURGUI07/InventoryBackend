@@ -39,21 +39,21 @@ public class SuppOrder extends BaseEntity{
     @Column(name="supp_order_id")
     private Integer id;
     
+     @Column(name="order_code")
+    private String code;
+    
     @ManyToOne
     @JoinColumn(name="supplier_id")
     @JsonBackReference
     private Supplier supplier;
+  
+    
+    @Column(name="order_date")
+    private Instant orderDate;
     
     @OneToMany(mappedBy="suppOrder")
     @JsonManagedReference
     private List<SuppOrderDetail> suppOrderDetails  = new ArrayList<>();
-    
-    @Column(name="order_code")
-    private String code;
-    
-    
-    @Column(name="order_date")
-    private Instant orderDate;
     
     public void addDetail(SuppOrderDetail d){
         this.suppOrderDetails.add(d);

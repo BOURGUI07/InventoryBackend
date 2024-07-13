@@ -35,10 +35,7 @@ public class Customer extends BaseEntity{
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="customer_id")
     private Integer id;
-    
-    @OneToMany(mappedBy="customer")
-    @JsonManagedReference
-    private List<CustOrder> custOrders = new ArrayList<>();
+ 
     
     @Column(name="firstname")
     private String firstName;
@@ -57,6 +54,12 @@ public class Customer extends BaseEntity{
     
     @Column(name="pic")
     private String pic;
+    
+       
+    @OneToMany(mappedBy="customer")
+    @JsonManagedReference
+    private List<CustOrder> custOrders = new ArrayList<>();
+    
     
     public void addOrder(CustOrder o){
         custOrders.add(o);
