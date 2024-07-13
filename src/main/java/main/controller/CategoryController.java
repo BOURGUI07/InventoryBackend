@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @Validated
+@CrossOrigin(origins = "http://localhost:8080")
 public class CategoryController {
     @Autowired
     public CategoryController(CategoryService service) {
@@ -38,7 +40,11 @@ public class CategoryController {
     
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> findAll(){
-        return ResponseEntity.ok(service.findAll());
+        var s= service.findAll();
+        if(s.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(s);
     }
     
     @GetMapping("/categories/{id}")
@@ -46,10 +52,11 @@ public class CategoryController {
         if(id<0 || id>=service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
-        if(service.findById(id)==null){
+        var s = service.findById(id);
+        if(s==null){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return ResponseEntity.ok(service.findById(id));
+        return ResponseEntity.ok(s);
     }
     
     @GetMapping("/categories/{name}")
