@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.SalesDetailDTO;
@@ -38,6 +41,11 @@ public class SalesDetailController{
     }
     private final SalesDetailService service;
     
+    @Operation(summary="Get All Sales Details", description="Get a List of Sales Details")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Sales Details"),
+        @ApiResponse(responseCode="204", description="Found an empty list of Sales Details")
+    })
     @GetMapping
     public ResponseEntity<List<SalesDetailDTO>> findAll(){
         var s = service.findAll();
@@ -47,6 +55,12 @@ public class SalesDetailController{
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get sales detail by Id", description="Return a single sales detail")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The sales detail"),
+        @ApiResponse(responseCode="404", description="sales detail not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{productid}/{salesid}")
     public ResponseEntity<SalesDetailDTO> findById(@PathVariable Integer productid,@PathVariable Integer salesid ){
         if(productid<0 || salesid<0){
@@ -59,12 +73,19 @@ public class SalesDetailController{
         return ResponseEntity.ok(s);
     }
     
-    
+    @Operation(summary="Create a new sales detail")
+    @ApiResponse(responseCode="201", description="sales detail created successfully")
     @PostMapping
     public ResponseEntity<SalesDetailDTO> create(@Valid @RequestBody SalesDetailDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a sales detail")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="sales detail Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="sales detail not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{productid}/{salesid}")
     public ResponseEntity<SalesDetailDTO> update(@PathVariable Integer productid,@PathVariable Integer salesid , @Valid @RequestBody SalesDetailDTO x){
         if(productid<0 || salesid<0){
@@ -76,7 +97,12 @@ public class SalesDetailController{
         return ResponseEntity.ok(service.update(productid,salesid, x));
     }
     
-    
+    @Operation(summary="Delete a sales detail")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="sales detail Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="sales detail not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{productid}/{salesid}")
     public ResponseEntity<Void> delete(@PathVariable Integer productid, @PathVariable Integer salesid){
         if(productid<0 || salesid<0){

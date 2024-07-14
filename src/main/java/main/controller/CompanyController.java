@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.CompanyDTO;
@@ -38,6 +41,11 @@ public class CompanyController {
     }
     private final CompanyService service;
     
+    @Operation(summary="Get All Companies", description="Get a List of Companies")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Companies"),
+        @ApiResponse(responseCode="204", description="Found an empty list of Companies")
+    })
     @GetMapping
     public ResponseEntity<List<CompanyDTO>> findAll(){
         var s = service.findAll();
@@ -47,6 +55,12 @@ public class CompanyController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get company by Id", description="Return a single company")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The company"),
+        @ApiResponse(responseCode="404", description="company not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -59,7 +73,13 @@ public class CompanyController {
         return ResponseEntity.ok(s);
     }
     
-    @GetMapping("/{name}")
+    @Operation(summary="Get company by Name", description="Return a single company")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The company"),
+        @ApiResponse(responseCode="404", description="company not found"),
+        @ApiResponse(responseCode="400", description="The input name is blank")
+    })
+    @GetMapping("/name/{name}")
     public ResponseEntity<CompanyDTO> findByName(@PathVariable String name){
         var c = service.findByName(name);
         if(name.isBlank()){
@@ -71,11 +91,19 @@ public class CompanyController {
         return ResponseEntity.ok(c);
     }
     
+    @Operation(summary="Create a new company")
+    @ApiResponse(responseCode="201", description="company created successfully")
     @PostMapping
     public ResponseEntity<CompanyDTO> create(@Valid @RequestBody CompanyDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a company")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="company Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="company not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<CompanyDTO> update(@PathVariable Integer id, @Valid @RequestBody CompanyDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -87,30 +115,40 @@ public class CompanyController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Add product to a company")
     @PutMapping("/{companyid}/products/{productid}")
     public ResponseEntity<Void> addProduct(@PathVariable Integer companyid, @PathVariable Integer productid){
         service.addProductToCompany(companyid, productid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Remove product from a company")
     @DeleteMapping("/{companyid}/products/{productid}")
     public ResponseEntity<Void> removeProduct(@PathVariable Integer companyid, @PathVariable Integer productid){
         service.removeProductFromCompany(companyid, productid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Add user to a company")
     @PutMapping("/{companyid}/users/{userid}")
     public ResponseEntity<Void> addUser(@PathVariable Integer companyid, @PathVariable Integer userid){
         service.addUserToCompany(companyid, userid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Remove user from a company")
     @DeleteMapping("/{companyid}/users/{userid}")
     public ResponseEntity<Void> removeUser(@PathVariable Integer companyid, @PathVariable Integer userid){
         service.removeUserFromCompany(companyid, userid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Delete a company")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="company Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="company not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.CategoryDTO;
@@ -38,6 +41,11 @@ public class CategoryController {
     }
     private final CategoryService service;
     
+    @Operation(summary="Get All Categories", description="Get a List of Categories")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Categories"),
+        @ApiResponse(responseCode="204", description="Found an empty list of categories")
+    })
     @GetMapping("/categories")
     public ResponseEntity<List<CategoryDTO>> findAll(){
         var s= service.findAll();
@@ -47,6 +55,12 @@ public class CategoryController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get Category by Id", description="Return a single category")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The category"),
+        @ApiResponse(responseCode="404", description="Category not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/categories/{id}")
     public ResponseEntity<CategoryDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -59,7 +73,13 @@ public class CategoryController {
         return ResponseEntity.ok(s);
     }
     
-    @GetMapping("/categories/{name}")
+    @Operation(summary="Get Category By Name", description="Return a single category")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully the category"),
+        @ApiResponse(responseCode="404", description="category not found"),
+        @ApiResponse(responseCode="400", description="The input name is blank")
+    })
+    @GetMapping("/categories/name/{name}")
     public ResponseEntity<CategoryDTO> findByName(@PathVariable String name){
         var c = service.findByName(name);
         if(name.isBlank()){
@@ -71,11 +91,19 @@ public class CategoryController {
         return ResponseEntity.ok(c);
     }
     
+    @Operation(summary="Create a new category")
+    @ApiResponse(responseCode="201", description="Category created successfully")
     @PostMapping("/categories")
     public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a Category")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Category Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="category not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/categories/{id}")
     public ResponseEntity<CategoryDTO> update(@PathVariable Integer id, @Valid @RequestBody CategoryDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -87,18 +115,28 @@ public class CategoryController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Add product to a category")
+    @ApiResponse(responseCode="204", description="Product added sucessfully to the category")
     @PutMapping("/categories/{categoryid}/products/{productid}")
     public ResponseEntity<Void> addProduct(@PathVariable Integer categoryid, @PathVariable Integer productid){
         service.addProductToCateg(categoryid, productid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Remove product to a category")
+    @ApiResponse(responseCode="204", description="Product Removed sucessfully from the category")
     @DeleteMapping("/categories/{categoryid}/products/{productid}")
     public ResponseEntity<Void> removeProduct(@PathVariable Integer categoryid, @PathVariable Integer productid){
         service.addProductToCateg(categoryid, productid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Delete a Category")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="Category Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="category not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

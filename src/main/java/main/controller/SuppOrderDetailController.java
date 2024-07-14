@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.SuppOrderDetailDTO;
@@ -38,6 +41,11 @@ public class SuppOrderDetailController {
     }
     private final SuppOrderDetailService service;
     
+    @Operation(summary="Get All Supplier Order Details", description="Get a List of Supplier Order Details")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Supplier Order Details"),
+        @ApiResponse(responseCode="204", description="Found an empty list of Supplier Order Details")
+    })
     @GetMapping
     public ResponseEntity<List<SuppOrderDetailDTO>> findAll(){
         var s = service.findAll();
@@ -47,6 +55,12 @@ public class SuppOrderDetailController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get supplier order detail by Id", description="Return a single supplier order detail")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The supplier order detail"),
+        @ApiResponse(responseCode="404", description="supplier order detail not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{productid}/{orderid}")
     public ResponseEntity<SuppOrderDetailDTO> findById(@PathVariable Integer productid,@PathVariable Integer orderid ){
         if(productid<0 || orderid<0){
@@ -59,12 +73,19 @@ public class SuppOrderDetailController {
         return ResponseEntity.ok(s);
     }
     
-    
+    @Operation(summary="Create a new supplier order detail")
+    @ApiResponse(responseCode="201", description="supplier order detail created successfully")
     @PostMapping
     public ResponseEntity<SuppOrderDetailDTO> create(@Valid @RequestBody SuppOrderDetailDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a supplier order detail")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="supplier order detail Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="supplier order detail not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{productid}/{orderid}")
     public ResponseEntity<SuppOrderDetailDTO> update(@PathVariable Integer productid,@PathVariable Integer orderid , @Valid @RequestBody SuppOrderDetailDTO x){
         if(productid<0 || orderid<0){
@@ -76,7 +97,12 @@ public class SuppOrderDetailController {
         return ResponseEntity.ok(service.update(productid,orderid, x));
     }
     
-    
+    @Operation(summary="Delete a supplier order detail")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="supplier order detail Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="supplier order detail not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{productid}/{orderid}")
     public ResponseEntity<Void> delete(@PathVariable Integer productid, @PathVariable Integer orderid){
         if(productid<0 || orderid<0){

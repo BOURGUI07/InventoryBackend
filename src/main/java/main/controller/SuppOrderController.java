@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.SuppOrderDTO;
@@ -38,6 +41,11 @@ public class SuppOrderController {
     }
     private final SuppOrderService service;
     
+    @Operation(summary="Get All Supplier Orders", description="Get a List of Supplier Orders")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Supplier Orders"),
+        @ApiResponse(responseCode="204", description="Found an empty list of Supplier Orders")
+    })
     @GetMapping
     public ResponseEntity<List<SuppOrderDTO>> findAll(){
         var s = service.findAll();
@@ -47,6 +55,12 @@ public class SuppOrderController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get Supplier order by Id", description="Return a single Supplier order")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The Supplier order"),
+        @ApiResponse(responseCode="404", description="Supplier order not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<SuppOrderDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -59,7 +73,13 @@ public class SuppOrderController {
         return ResponseEntity.ok(s);
     }
     
-    @GetMapping("/{code}")
+    @Operation(summary="Get Supplier order by code", description="Return a single Supplier order")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The Supplier order"),
+        @ApiResponse(responseCode="404", description="Supplier order not found"),
+        @ApiResponse(responseCode="400", description="The input code is blank")
+    })
+    @GetMapping("/code/{code}")
     public ResponseEntity<SuppOrderDTO> findByCode(@PathVariable String code){
         var c = service.findByCode(code);
         if(code.isBlank()){
@@ -71,11 +91,19 @@ public class SuppOrderController {
         return ResponseEntity.ok(c);
     }
     
+    @Operation(summary="Create a new supplier order")
+    @ApiResponse(responseCode="201", description="supplier order created successfully")
     @PostMapping
     public ResponseEntity<SuppOrderDTO> create(@Valid @RequestBody SuppOrderDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a supplier order")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="supplier order Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="supplier order not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<SuppOrderDTO> update(@PathVariable Integer id, @Valid @RequestBody SuppOrderDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -87,19 +115,26 @@ public class SuppOrderController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Add order detail to a supplier order")
     @PutMapping("/{orderid}/details/{detailid}")
     public ResponseEntity<Void> addDetail(@PathVariable Integer orderid, @PathVariable Integer detailid){
         service.adddetailToOrder(orderid, detailid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="remove order detail from a supplier order")
     @DeleteMapping("/{orderid}/details/{detailid}")
     public ResponseEntity<Void> removeDetail(@PathVariable Integer orderid, @PathVariable Integer detailid){
         service.removeDetailFromOrder(orderid, detailid);
         return ResponseEntity.noContent().build();
     }
     
-    
+    @Operation(summary="Delete a supplier order")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="supplier order Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="supplier order not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

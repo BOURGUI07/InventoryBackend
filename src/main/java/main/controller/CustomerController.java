@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.CustomerDTO;
@@ -39,6 +42,11 @@ public class CustomerController {
     }
     private final CustomerService service;
     
+    @Operation(summary="Get All Customers", description="Get a List of Customers")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Customers"),
+        @ApiResponse(responseCode="204", description="Found an empty list of Customers")
+    })
     @GetMapping
     public ResponseEntity<List<CustomerDTO>> findAll(){
         var s = service.findAll();
@@ -48,6 +56,12 @@ public class CustomerController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get customer by Id", description="Return a single customer")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The customer"),
+        @ApiResponse(responseCode="404", description="customer not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<CustomerDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -60,6 +74,11 @@ public class CustomerController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get customer by first or lastname", description="Return a single customer")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The customer"),
+        @ApiResponse(responseCode="404", description="customer not found")
+    })
     @GetMapping("/search")
     public ResponseEntity<CustomerDTO> findByName(
             @RequestParam(required=false) String firstname,
@@ -68,11 +87,19 @@ public class CustomerController {
         return ResponseEntity.ok(c);
     }
     
+    @Operation(summary="Create a new customer")
+    @ApiResponse(responseCode="201", description="customer created successfully")
     @PostMapping
     public ResponseEntity<CustomerDTO> create(@Valid @RequestBody CustomerDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a customer")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="customer Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="customer not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<CustomerDTO> update(@PathVariable Integer id, @Valid @RequestBody CustomerDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -84,18 +111,26 @@ public class CustomerController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Add order to a customer")
     @PutMapping("/{customerid}/orders/{orderid}")
     public ResponseEntity<Void> addOrder(@PathVariable Integer customerid, @PathVariable Integer orderid){
         service.addOrder(customerid, orderid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="remove order from a customer")
     @DeleteMapping("/{customerid}/orders/{orderid}")
     public ResponseEntity<Void> removeOrder(@PathVariable Integer customerid, @PathVariable Integer orderid){
         service.removeOrder(customerid, orderid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Delete a customer")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="customer Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="customer not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

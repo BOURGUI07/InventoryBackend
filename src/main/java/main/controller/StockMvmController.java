@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.StockMvmDTO;
@@ -38,6 +41,11 @@ public class StockMvmController {
     }
     private final StockMvmService service;
     
+    @Operation(summary="Get All Stock Movements", description="Get a List of Stock Movements")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Stock Movements"),
+        @ApiResponse(responseCode="204", description="Found an empty list of Stock Movements")
+    })
     @GetMapping
     public ResponseEntity<List<StockMvmDTO>> findAll(){
         var s = service.findAll();
@@ -47,6 +55,12 @@ public class StockMvmController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get stock movement by Id", description="Return a single stock movement")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The stock movement"),
+        @ApiResponse(responseCode="404", description="stock movement not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<StockMvmDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -59,12 +73,20 @@ public class StockMvmController {
         return ResponseEntity.ok(s);
     }
     
- 
+    
+    @Operation(summary="Create a new stock movement")
+    @ApiResponse(responseCode="201", description="stock movement created successfully")
     @PostMapping
     public ResponseEntity<StockMvmDTO> create(@Valid @RequestBody StockMvmDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a stock movement")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="stock movement Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="stock movement not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<StockMvmDTO> update(@PathVariable Integer id, @Valid @RequestBody StockMvmDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -76,6 +98,12 @@ public class StockMvmController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Delete a stock movement")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="stock movement Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="stock movement not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

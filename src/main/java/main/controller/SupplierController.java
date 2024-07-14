@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.SupplierDTO;
@@ -39,6 +42,11 @@ public class SupplierController {
     }
     private final SupplierService service;
     
+    @Operation(summary="Get All suppliers", description="Get a List of suppliers")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of suppliers"),
+        @ApiResponse(responseCode="204", description="Found an empty list of suppliers")
+    })
     @GetMapping
     public ResponseEntity<List<SupplierDTO>> findAll(){
         var s = service.findAll();
@@ -48,6 +56,12 @@ public class SupplierController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get supplier by Id", description="Return a single supplier")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The supplier"),
+        @ApiResponse(responseCode="404", description="supplier not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<SupplierDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -60,6 +74,12 @@ public class SupplierController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get supplier by Name", description="Return a single supplier")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The supplier"),
+        @ApiResponse(responseCode="404", description="supplier not found"),
+        @ApiResponse(responseCode="400", description="The input name is blank")
+    })
     @GetMapping("/search")
     public ResponseEntity<SupplierDTO> findByName(
             @RequestParam(required=false) String firstname,
@@ -68,11 +88,19 @@ public class SupplierController {
         return ResponseEntity.ok(c);
     }
     
+    @Operation(summary="Create a new supplier")
+    @ApiResponse(responseCode="201", description="supplier created successfully")
     @PostMapping
     public ResponseEntity<SupplierDTO> create(@Valid @RequestBody SupplierDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a supplier")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="supplier Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="supplier not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<SupplierDTO> update(@PathVariable Integer id, @Valid @RequestBody SupplierDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -84,18 +112,26 @@ public class SupplierController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Add order to a supplier")
     @PutMapping("/{supplierid}/orders/{orderid}")
     public ResponseEntity<Void> addOrder(@PathVariable Integer supplierid, @PathVariable Integer orderid){
         service.addOrder(supplierid, orderid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="remove order from a supplier")
     @DeleteMapping("/{supplierid}/orders/{orderid}")
     public ResponseEntity<Void> removeOrder(@PathVariable Integer supplierid, @PathVariable Integer orderid){
         service.removeOrder(supplierid, orderid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="Delete a supplier")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="supplier Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="supplier not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,6 +44,11 @@ public class ProductController {
     }
     private final ProductService service;
     
+    @Operation(summary="Get All products", description="Get a List of products")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of products"),
+        @ApiResponse(responseCode="204", description="Found an empty list of products")
+    })
     @GetMapping("/products")
     public ResponseEntity<List<ProductDTO>> findAll(){
         var s = service.findAll();
@@ -50,6 +58,12 @@ public class ProductController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get product by Id", description="Return a single product")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The product"),
+        @ApiResponse(responseCode="404", description="product not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/products/{id}")
     public ResponseEntity<ProductDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -62,7 +76,13 @@ public class ProductController {
         return ResponseEntity.ok(s);
     }
     
-    @GetMapping("/products/{name}")
+    @Operation(summary="Get product by Name", description="Return a single product")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The product"),
+        @ApiResponse(responseCode="404", description="product not found"),
+        @ApiResponse(responseCode="400", description="The input name is blank")
+    })
+    @GetMapping("/products/name/{name}")
     public ResponseEntity<ProductDTO> findByName(@PathVariable String name){
         var c = service.findByName(name);
         if(name.isBlank()){
@@ -74,11 +94,19 @@ public class ProductController {
         return ResponseEntity.ok(c);
     }
     
+    @Operation(summary="Create a new product")
+    @ApiResponse(responseCode="201", description="product created successfully")
     @PostMapping("/products")
     public ResponseEntity<ProductDTO> create(@Valid @RequestBody ProductDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a product")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="product Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="product not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/products/{id}")
     public ResponseEntity<ProductDTO> update(@PathVariable Integer id, @Valid @RequestBody ProductDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -90,6 +118,12 @@ public class ProductController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Delete a product")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="product Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="product not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -103,16 +137,17 @@ public class ProductController {
     }
     
     //GET /api/products/search?name=example&categoryId=1&minPrice=10.00&maxPrice=100.00
+    @Operation(summary="search products based on category id and min/max price")
     @GetMapping("/products/search")
     public ResponseEntity<List<ProductDTO>> search(
-            @RequestParam(required=false) String name,
             @RequestParam(required=false) Integer categoryId,
             @RequestParam(required=false) BigDecimal minPrice,
             @RequestParam(required=false) BigDecimal maxPrice
     ){
-        return ResponseEntity.ok(service.searchProducts(name, categoryId, minPrice, maxPrice));
+        return ResponseEntity.ok(service.searchProducts(categoryId, minPrice, maxPrice));
     }
     
+    @Operation(summary="Get product stock movement history")
     @GetMapping("/products/stock/{id}")
     public ResponseEntity<List<StockMvmDTO>> getproductHistory(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

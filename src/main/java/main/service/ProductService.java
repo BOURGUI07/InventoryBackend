@@ -161,10 +161,9 @@ public class ProductService {
     }
     
     //Implement a method to search for products with multiple filters like name, category, price range, etc.
-    public List<ProductDTO> searchProducts(String name, Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice){
+    public List<ProductDTO> searchProducts(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice){
         return productRepo.findAll().stream().filter(p -> 
-                p.getName().equals(name) 
-                && p.getCateg().getId().equals(categoryId)
+                p.getCateg().getId().equals(categoryId)
                 && p.getPrice().compareTo(maxPrice)<=0
                 && p.getPrice().compareTo(minPrice)>=0).map(mapper::toDTO).collect(Collectors.toList());          
     }

@@ -4,6 +4,9 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import main.dto.SalesDTO;
@@ -38,6 +41,11 @@ public class SalesController {
     }
     private final SalesService service;
     
+    @Operation(summary="Get All Sales", description="Get a List of Sales")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found List of Sales"),
+        @ApiResponse(responseCode="204", description="Found an empty list of Sales")
+    })
     @GetMapping
     public ResponseEntity<List<SalesDTO>> findAll(){
         var s = service.findAll();
@@ -47,6 +55,12 @@ public class SalesController {
         return ResponseEntity.ok(s);
     }
     
+    @Operation(summary="Get sale by Id", description="Return a single sale")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The sale"),
+        @ApiResponse(responseCode="404", description="sale not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @GetMapping("/{id}")
     public ResponseEntity<SalesDTO> findById(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){
@@ -59,7 +73,13 @@ public class SalesController {
         return ResponseEntity.ok(s);
     }
     
-    @GetMapping("/{code}")
+    @Operation(summary="Get sale by code", description="Return a single sale")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="Found Sucessfully The sale"),
+        @ApiResponse(responseCode="404", description="sale not found"),
+        @ApiResponse(responseCode="400", description="The input code is blank")
+    })
+    @GetMapping("/code/{code}")
     public ResponseEntity<SalesDTO> findByCode(@PathVariable String code){
         var c = service.findByCode(code);
         if(code.isBlank()){
@@ -71,11 +91,19 @@ public class SalesController {
         return ResponseEntity.ok(c);
     }
     
+    @Operation(summary="Create a new sale")
+    @ApiResponse(responseCode="201", description="sale created successfully")
     @PostMapping
     public ResponseEntity<SalesDTO> create(@Valid @RequestBody SalesDTO x){
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(x));
     }
     
+    @Operation(summary="Update a sale")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="200", description="sale Updated Sucessfully"),
+        @ApiResponse(responseCode="404", description="sale not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<SalesDTO> update(@PathVariable Integer id, @Valid @RequestBody SalesDTO x){
         if(id<0 || id>=service.findAll().size()){
@@ -87,12 +115,14 @@ public class SalesController {
         return ResponseEntity.ok(service.update(id, x));
     }
     
+    @Operation(summary="Add sales detail to a sale")
     @PutMapping("/{salesid}/details/{detailid}")
     public ResponseEntity<Void> addDetail(@PathVariable Integer salesid, @PathVariable Integer detailid){
         service.addDetail(salesid, detailid);
         return ResponseEntity.noContent().build();
     }
     
+    @Operation(summary="remove a sales detail from a sale")
     @DeleteMapping("/{salesid}/details/{detailid}")
     public ResponseEntity<Void> removeDetail(@PathVariable Integer salesid, @PathVariable Integer detailid){
         service.removeDetail(salesid, detailid);
@@ -100,6 +130,12 @@ public class SalesController {
     }
     
     
+    @Operation(summary="Delete a sale")
+    @ApiResponses(value={
+        @ApiResponse(responseCode="204", description="sale Deleted Sucessfully"),
+        @ApiResponse(responseCode="404", description="sale not found"),
+        @ApiResponse(responseCode="400", description="The input id is non-valid")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
         if(id<0 || id>=service.findAll().size()){

@@ -4,6 +4,7 @@
  */
 package main.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.time.Instant;
 import java.util.List;
 import main.dto.BestCustomerDTO;
@@ -37,6 +38,7 @@ public class GlobalController {
     }
     private final GlobalService service;
     
+    @Operation(summary="get the most popular products")
     @GetMapping("/popular-products")
     public ResponseEntity<List<PopularProductDTO>> popularProducts(
             @RequestParam(required=false) Instant startdate,
@@ -47,6 +49,7 @@ public class GlobalController {
         return ResponseEntity.ok(service.getMostPopularProducts(startdate, enddate));
     }
     
+    @Operation(summary="get the best customers")
     @GetMapping("/best-customers")
     public ResponseEntity<List<BestCustomerDTO>> bestCustomers(
             @RequestParam(required=false) Instant startdate,
@@ -57,21 +60,25 @@ public class GlobalController {
         return ResponseEntity.ok(service.getBestCustomers(startdate, enddate));
     }
     
+    @Operation(summary="get products with the highest order quantity")
     @GetMapping("/products-with-highest-qty")
     public ResponseEntity<List<ProductHighestQtyDTO>> productWithHighestQty(){
         return ResponseEntity.ok(service.productsWithHighestQty());
     }
     
+    @Operation(summary="get sales by a specific category")
     @GetMapping("/sales-by-category")
     public ResponseEntity<List<SalesByCategoryDTO>> salesByCategory(){
         return ResponseEntity.ok(service.salesByCategory());
     }
     
+    @Operation(summary="get customers who have no orders")
     @GetMapping("/customers-with-no-orders")
     public ResponseEntity<List<CustomersNoOrdersDTO>> customersWithNoOders(){
         return ResponseEntity.ok(service.customersWithNoOrders());
     }
     
+    @Operation(summary="get products whose quantity is below a specific standard")
     @GetMapping("/products-qty-tbelow")
     public ResponseEntity<List<ProductQtyDTO>> productsQtyBelow(@RequestParam Integer qty){
         if(qty<0){
@@ -80,6 +87,7 @@ public class GlobalController {
         return ResponseEntity.ok(service.productsQtyBelow(qty));
     }
     
+    @Operation(summary="get products that belong to a specific company")
     @GetMapping("/products-belonging-to-company")
     public ResponseEntity<List<CompanyProductsDTO>> productsBelongingToCompany(@RequestParam String name){
         return ResponseEntity.ok(service.productsBelongingToCompany(name));
