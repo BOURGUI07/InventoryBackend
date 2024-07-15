@@ -64,7 +64,7 @@ public class CustomerController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CustomerDTO> findById(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         var s = service.findById(id);
@@ -102,7 +102,7 @@ public class CustomerController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<CustomerDTO> update(@PathVariable Integer id, @Valid @RequestBody CustomerDTO x){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
@@ -133,7 +133,7 @@ public class CustomerController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
