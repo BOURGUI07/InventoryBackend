@@ -2,24 +2,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/UnitTests/JUnit5TestClass.java to edit this template
  */
-package Inventory.Inv.unit_tests;
+package Inventory.Inv.service_layer_tests;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
-import main.dto.CustOrderDTO;
-import main.dto.CustomerDTO;
-import main.entity.Address;
-import main.entity.CustOrder;
-import main.entity.Customer;
-import main.mapper.CustomerMapper;
-import main.repo.CustOrderRepo;
-import main.repo.CustomerRepo;
-import main.service.CustomerService;
+import main.dto.CompanyDTO;
+import main.entity.Company;
+import main.mapper.CompanyMapper;
+import main.repo.CompanyRepo;
+import main.repo.ProductRepo;
+import main.repo.UserRepo;
+import main.service.CompanyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,34 +34,35 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @author hp
  */
 @ExtendWith(MockitoExtension.class)
-public class CustomerServiceTest {
+public class CompanyServiceTest {
     
     @Mock
-    private CustomerMapper mapper;
+    private CompanyMapper mapper;
     
     @Mock
-    private CustomerRepo repo;
+    private CompanyRepo repo;
     
     @Mock
-    private CustOrderRepo orderRepo;
+    private ProductRepo productRepo;
     
-    @InjectMocks
-    private CustomerService service;
+    @Mock
+    private UserRepo userRepo;
     
     private Validator validator;
     
-    private Customer e = new Customer(1,"first","last",new Address(),"younessbourgui07@gmail.com","0606","pic", new ArrayList<>());
-    private CustomerDTO x = new CustomerDTO(1,"first","last",new Address(),"younessbourgui07@gmail.com","0606","pic", new ArrayList<>());
+    @InjectMocks
+    private CompanyService service;
     
-    private CustOrder e1 = new CustOrder(1,"code", Instant.now(),null, new ArrayList<>());
-    
-    public CustomerServiceTest() {
-        
-        
+    private CompanyDTO x;
+    private Company e = new Company();
+    public CompanyServiceTest() {
+        x= new CompanyDTO(1,"name",new ArrayList<>(),new ArrayList<>() );
+        e.setId(1);
+        e.setUsers(new ArrayList<>());
+        e.setProducts(new ArrayList<>());
+        e.setName("name");
     }
-    
-    
-    
+       
     @BeforeEach
     public void setUp() {
         validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -72,26 +70,25 @@ public class CustomerServiceTest {
     }
     
     @Test
-    void testCreate(){
+    void testCreateEntity(){
         when(mapper.toEntity(x)).thenReturn(e);
         when(repo.save(e)).thenReturn(e);
         when(mapper.toDTO(e)).thenReturn(x);
         
         assertEquals(x,service.create(x));
         
-        verify(repo,times(1)).save(e);                                               
+        verify(repo, times(1)).save(e);
     }
     
-    
     @Test
-    void testUpdate(){
+    void testUpdateEntity(){
         when(repo.findById(1)).thenReturn(Optional.of(e));
         when(repo.save(e)).thenReturn(e);
         when(mapper.toDTO(e)).thenReturn(x);
         
-        assertEquals(x,service.update(1,x));
+        assertEquals(x,service.update(1, x));
         
-        verify(repo,times(1)).save(e);                                               
+        verify(repo,times(1)).save(e);
     }
     
     @Test
@@ -99,7 +96,7 @@ public class CustomerServiceTest {
         when(repo.findById(1)).thenReturn(Optional.of(e));
         when(mapper.toDTO(e)).thenReturn(x);
         
-        assertEquals(x,service.findById(1));
+        assertEquals(x, service.findById(1));
     }
     
     @Test
@@ -107,11 +104,11 @@ public class CustomerServiceTest {
         when(repo.findAll()).thenReturn(Arrays.asList(e));
         when(mapper.toDTO(e)).thenReturn(x);
         
-        assertEquals(1,service.findAll().size());
+        assertEquals(1, service.findAll().size());
     }
     
     @Test
-    void testDeleet(){
+    void testDeleteEntity(){
         doNothing().when(repo).delete(e);
         when(repo.findById(1)).thenReturn(Optional.of(e));
         service.delete(1);
@@ -119,20 +116,10 @@ public class CustomerServiceTest {
     }
     
     @Test
-    void testAddRemoveOrder(){
-        when(repo.findById(1)).thenReturn(Optional.of(e));
-        when(orderRepo.findById(1)).thenReturn(Optional.of(e1));
-        service.addOrder(1, 1);
-        assertTrue(e1.getCustomer().equals(e));
-        service.removeOrder(1, 1);
-        assertTrue(e1.getCustomer()==null);
-    }
-    
-    @Test
-    void testEmailValidation(){
-        var s = new CustomerDTO(1,"first","last",new Address(),"email","0606","pic", new ArrayList<>());
-        assertThrows(ConstraintViolationException.class, () -> {
-            service.create(s);
+   void testValidation(){
+       var c1 = new CompanyDTO(1,"",new ArrayList<>() , new ArrayList<>());
+       assertThrows(ConstraintViolationException.class, () -> {
+            service.create(c1);
         });
-    }
+   }
 }

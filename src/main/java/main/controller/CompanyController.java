@@ -63,7 +63,7 @@ public class CompanyController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDTO> findById(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         var s = service.findById(id);
@@ -106,7 +106,7 @@ public class CompanyController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<CompanyDTO> update(@PathVariable Integer id, @Valid @RequestBody CompanyDTO x){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
@@ -151,7 +151,7 @@ public class CompanyController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
