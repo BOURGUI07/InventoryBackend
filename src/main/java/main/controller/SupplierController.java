@@ -64,7 +64,7 @@ public class SupplierController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<SupplierDTO> findById(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         var s = service.findById(id);
@@ -103,7 +103,7 @@ public class SupplierController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<SupplierDTO> update(@PathVariable Integer id, @Valid @RequestBody SupplierDTO x){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
@@ -134,7 +134,7 @@ public class SupplierController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
