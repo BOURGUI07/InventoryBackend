@@ -66,7 +66,7 @@ public class ProductController {
     })
     @GetMapping("/products/{id}")
     public ResponseEntity<ProductDTO> findById(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         var s = service.findById(id);
@@ -109,7 +109,7 @@ public class ProductController {
     })
     @PutMapping("/products/{id}")
     public ResponseEntity<ProductDTO> update(@PathVariable Integer id, @Valid @RequestBody ProductDTO x){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
@@ -126,7 +126,7 @@ public class ProductController {
     })
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
@@ -150,7 +150,7 @@ public class ProductController {
     @Operation(summary="Get product stock movement history")
     @GetMapping("/products/stock/{id}")
     public ResponseEntity<List<StockMvmDTO>> getproductHistory(@PathVariable Integer id){
-        if(id<0 || id>=service.findAll().size()){
+        if(id<0 || id>service.findAll().size()){
             throw new RessourceNotFoundException("Id non-valid");
         }
         if(service.findById(id)==null){
