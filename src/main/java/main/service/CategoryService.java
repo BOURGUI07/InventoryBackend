@@ -20,9 +20,13 @@ import main.entity.Category;
 import main.mapper.CategoryMapper;
 import main.repo.CategRepo;
 import main.repo.ProductRepo;
+import main.specification.CategorySpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 /**
@@ -152,5 +156,17 @@ public class CategoryService {
     
     @CacheEvict(value={"CategoryById","AllCategories","CategoryByName"}, allEntries=true)
     public void clearCache(){
+    }
+    
+    public Page<CategoryDTO> findAllPaginated(Pageable pageable, String name, String desc){
+        Specification<Category> spec = Specification.where(null);
+        if(name!=null && !name.isEmpty()){
+            spec = spec.and(CategorySpecification.nameContains(name));
+        }
+        if(desc!=null && !desc.isEmpty()){
+            spec = spec.and(CategorySpecification.descContains(desc));
+        }
+        Page<Category> page = repo.findAll(spec, pageable);
+        return page.map(mapper::toDTO);
     }
 }

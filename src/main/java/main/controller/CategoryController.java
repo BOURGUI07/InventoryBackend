@@ -8,11 +8,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import main.dto.CategoryDTO;
 import main.handler.RessourceNotFoundException;
 import main.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -147,5 +154,44 @@ public class CategoryController {
         }
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    /*
+    Pagination: GET /api/categories?page=1&size=5
+    Sorting: GET /api/categories?sort=name,asc
+    Filtering: GET /api/categories?name=electronics
+    Combined: GET /api/categories?page=1&size=5&sort=name,asc&name=electronics&desc=devices
+    */
+    @Operation(summary = "Get paginated list of categories", description = "Retrieve a paginated list of categories with optional search and sorting capabilities.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Found paginated list of categories"),
+        @ApiResponse(responseCode = "204", description = "No categories found"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
+    @GetMapping("/categories")
+    public ResponseEntity<Page<CategoryDTO>> findAllPaginated(
+            @RequestParam (defaultValue="0") int page,
+            @RequestParam (defaultValue="10") int size,
+            @RequestParam (defaultValue="id,asc") String[] sort,
+            @RequestParam (required = false) String name,
+            @RequestParam (required = false) String desc
+    ){
+        var orders = new ArrayList<Order>();
+        if (sort[0].contains(",")) {
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Order(Sort.Direction.fromString(_sort[1]), _sort[0]));
+            }
+        } else {
+            orders.add(new Order(Sort.Direction.fromString(sort[1]), sort[0]));
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
+        Page<CategoryDTO> pageCategories = service.findAllPaginated(pageable, name, desc);
+        
+        if (pageCategories.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        
+        return ResponseEntity.ok(pageCategories);
     }
 }
