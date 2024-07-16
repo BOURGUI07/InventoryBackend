@@ -21,9 +21,13 @@ import main.mapper.CompanyMapper;
 import main.repo.CompanyRepo;
 import main.repo.ProductRepo;
 import main.repo.UserRepo;
+import main.specification.CompanySpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 /**
@@ -190,5 +194,14 @@ public class CompanyService {
     @CacheEvict(value={"AllCompanies","CompanyById","CompanyByName"}, allEntries=true)
     public void clearCache(){
         
+    }
+    
+    public Page<CompanyDTO> findAllPaginated(Pageable pageable, String name){
+        Specification<Company> spec = Specification.where(null);
+        if(name!=null && !name.isEmpty()){
+            spec = spec.and(CompanySpecification.nameContains(name));
+        }
+        Page<Company> page = repo.findAll(spec, pageable);
+        return page.map(mapper::toDTO);
     }
 }

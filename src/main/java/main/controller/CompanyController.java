@@ -8,11 +8,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import main.dto.CategoryDTO;
 import main.dto.CompanyDTO;
 import main.handler.RessourceNotFoundException;
 import main.service.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -24,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -159,5 +166,37 @@ public class CompanyController {
         }
         service.delete(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @Operation(summary = "Get paginated list of companies", description = "Retrieve a paginated list of companies with optional search and sorting capabilities.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Found paginated list of companies"),
+        @ApiResponse(responseCode = "204", description = "No companies found"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
+    @GetMapping
+    public ResponseEntity<Page<CompanyDTO>> findAllPaginated(
+            @RequestParam (defaultValue="0") int page,
+            @RequestParam (defaultValue="10") int size,
+            @RequestParam (defaultValue="id,asc") String[] sort,
+            @RequestParam (required = false) String name
+    ){
+        var orders = new ArrayList<Sort.Order>();
+        if (sort[0].contains(",")) {
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Sort.Order(Sort.Direction.fromString(_sort[1]), _sort[0]));
+            }
+        } else {
+            orders.add(new Sort.Order(Sort.Direction.fromString(sort[1]), sort[0]));
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
+        Page<CompanyDTO> pageCategories = service.findAllPaginated(pageable, name);
+        
+        if (pageCategories.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        
+        return ResponseEntity.ok(pageCategories);
     }
 }
