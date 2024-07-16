@@ -191,12 +191,12 @@ public class ProductController {
             orders.add(new Sort.Order(Sort.Direction.fromString(sort[1]), sort[0]));
         }
         Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
-        Page<ProductDTO> pageCategories = service.findAllPaginated(pageable, name,desc,minPrice,maxPrice);
+        Page<ProductDTO> pageProducts = service.findAllPaginated(pageable, name,desc,minPrice,maxPrice);
         
-        if (pageCategories.isEmpty()) {
+        if (pageProducts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         
-        return ResponseEntity.ok(pageCategories);
+        return ResponseEntity.ok(pageProducts);
     }
 }

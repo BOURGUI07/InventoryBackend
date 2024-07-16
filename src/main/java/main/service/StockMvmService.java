@@ -8,16 +8,25 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import main.dto.CategoryDTO;
 import main.dto.StockMvmDTO;
+import main.entity.Category;
+import main.entity.StockMvm;
 import main.mapper.StockMvmMapper;
 import main.repo.ProductRepo;
 import main.repo.StockMvmRepo;
+import main.specification.CategorySpecification;
+import main.specification.StockMvmSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 /**
@@ -100,4 +109,32 @@ public class StockMvmService {
     public void clearCache(){
         
     }
+    
+    public Page<StockMvmDTO> findAllPaginated(Pageable pageable, String source, String destination, Integer minQty, Integer maxQty, Instant minDate, Instant maxDate){
+        Specification<StockMvm> spec = Specification.where(null);
+        if(source!=null && !source.isEmpty()){
+            spec = spec.and(StockMvmSpecification.sourceLocationContains(source));
+        }
+        if(destination!=null && !destination.isEmpty()){
+            spec = spec.and(StockMvmSpecification.DestinationLocationContains(destination));
+        }
+        
+        if(minQty!=null){
+            spec = spec.and(StockMvmSpecification.qtyMoreThan(minQty));
+        }
+        if(maxQty!=null){
+            spec = spec.and(StockMvmSpecification.qtyLessThan(maxQty));
+        }
+        
+        if(minDate!=null){
+            spec = spec.and(StockMvmSpecification.yearMoreThan(minDate));
+        }
+        if(maxDate!=null){
+            spec = spec.and(StockMvmSpecification.yearlessThan(maxDate));
+        }
+        Page<StockMvm> page = repo.findAll(spec, pageable);
+        return page.map(mapper::toDTO);
+    }
+    
+    
 }

@@ -191,12 +191,12 @@ public class CompanyController {
             orders.add(new Sort.Order(Sort.Direction.fromString(sort[1]), sort[0]));
         }
         Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
-        Page<CompanyDTO> pageCategories = service.findAllPaginated(pageable, name);
+        Page<CompanyDTO> pageCompanies = service.findAllPaginated(pageable, name);
         
-        if (pageCategories.isEmpty()) {
+        if (pageCompanies.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         
-        return ResponseEntity.ok(pageCategories);
+        return ResponseEntity.ok(pageCompanies);
     }
 }
