@@ -27,9 +27,13 @@ import main.repo.CustOrderDetailRepo;
 import main.repo.ProductRepo;
 import main.repo.SalesDetailRepo;
 import main.repo.StockMvmRepo;
+import main.specification.ProductSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 /**
@@ -181,5 +185,26 @@ public class ProductService {
     public void clearCache(){
         
     }
-
+    
+    
+    public Page<ProductDTO> findAllPaginated(Pageable pageable, String name, String desc, BigDecimal minPrice, BigDecimal maxPrice){
+        Specification<Product> spec = Specification.where(null);
+        if(name!=null && !name.isEmpty()){
+            spec = spec.and(ProductSpecification.nameContains(name));
+        }
+        
+        if(desc!=null && !desc.isEmpty()){
+            spec = spec.and(ProductSpecification.descContains(desc));
+        }
+        
+        if(maxPrice!=null){
+            spec = spec.and(ProductSpecification.priceLessThan(maxPrice));
+        }
+        
+        if(minPrice!=null){
+            spec = spec.and(ProductSpecification.priceMoreThan(minPrice));
+        }
+        var page = productRepo.findAll(spec, pageable);
+        return page.map(mapper::toDTO);
+    }
 }

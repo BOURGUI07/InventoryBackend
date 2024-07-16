@@ -9,12 +9,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import main.dto.CompanyDTO;
 import main.dto.ProductDTO;
 import main.dto.StockMvmDTO;
 import main.handler.RessourceNotFoundException;
 import main.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -157,5 +163,40 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.ok(service.getProductStockHistory(id));
+    }
+    
+    @Operation(summary = "Get paginated list of products", description = "Retrieve a paginated list of products with optional search and sorting capabilities.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Found paginated list of products"),
+        @ApiResponse(responseCode = "204", description = "No products found"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters")
+    })
+    @GetMapping
+    public ResponseEntity<Page<ProductDTO>> findAllPaginated(
+            @RequestParam (defaultValue="0") int page,
+            @RequestParam (defaultValue="10") int size,
+            @RequestParam (defaultValue="id,asc") String[] sort,
+            @RequestParam (required = false) String name,
+            @RequestParam (required = false) String desc,
+            @RequestParam (required = false) BigDecimal minPrice,
+            @RequestParam (required = false) BigDecimal maxPrice
+    ){
+        var orders = new ArrayList<Sort.Order>();
+        if (sort[0].contains(",")) {
+            for (String sortOrder : sort) {
+                String[] _sort = sortOrder.split(",");
+                orders.add(new Sort.Order(Sort.Direction.fromString(_sort[1]), _sort[0]));
+            }
+        } else {
+            orders.add(new Sort.Order(Sort.Direction.fromString(sort[1]), sort[0]));
+        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(orders));
+        Page<ProductDTO> pageCategories = service.findAllPaginated(pageable, name,desc,minPrice,maxPrice);
+        
+        if (pageCategories.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        
+        return ResponseEntity.ok(pageCategories);
     }
 }
