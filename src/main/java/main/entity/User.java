@@ -5,7 +5,6 @@
 package main.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -14,8 +13,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -41,45 +41,27 @@ public class User extends BaseEntity{
     @Column(name="user_id")
     private Integer id;
      
-    @Column(name="firstname")
-    private String firstName;
+    @Column(name="username")
+    private String username;
     
-    @Column(name="lastname")
-    private String lastName;
+    @Column(name="password")
+    private String password;
     
     @Column(name="email")
     private String email;
     
-    @Column(name="birthdate")
-    private Instant birthDate;
-    
-    @Column(name="pass_word")
-    private String password;
-    
-    
-    @Embedded
-    private Address address;
-    
-    @Column(name="pic")
-    private String pic;
+    private boolean enabled;
     
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="company_id")
     @JsonBackReference
     private Company company;
     
-    @OneToMany(mappedBy="user")
-    @JsonManagedReference
+    @ManyToMany(fetch=FetchType.LAZY)
+    @JoinTable(name="user_roles", 
+                joinColumns =@JoinColumn(name="user_id"), 
+                inverseJoinColumns=@JoinColumn(name="role_id"))
     private List<Role> roles = new ArrayList<>();
     
     
-    public void addRole(Role role){
-        roles.add(role);
-        role.setUser(this);
-    }
-    
-    public void removeRole(Role r){
-        roles.remove(r);
-        r.setUser(null);
-    }
 }

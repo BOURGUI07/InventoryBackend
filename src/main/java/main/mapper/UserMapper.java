@@ -28,13 +28,9 @@ public class UserMapper {
     
     public User toEntity(UserDTO x){
         var u = new User();
-        u.setAddress(x.address());
-        u.setBirthDate(x.birthdate());
         u.setCompany(repo.findById(x.companyId()).orElse(null));
         u.setEmail(x.email());
-        u.setPic(x.pic());
-        u.setLastName(x.lastName());
-        u.setFirstName(x.firstName());
+        u.setUsername(x.username());
         u.setPassword(x.password());
         if(x.roleIds()!=null){
             u.setRoles(roleRepo.findAllById(x.roleIds()));
@@ -44,6 +40,6 @@ public class UserMapper {
     
     public UserDTO toDTO(User u){
         var list = u.getRoles().stream().map(x -> x.getId()).collect(Collectors.toList());
-        return new UserDTO(u.getId(),u.getFirstName(),u.getLastName(),u.getBirthDate(),u.getPassword(),u.getAddress(),u.getEmail(),u.getPic(),u.getCompany().getId(),list);
+        return new UserDTO(u.getId(),u.getUsername(),u.getPassword(),u.getEmail(),u.isEnabled(),u.getCompany().getId(),list);
     }
 }

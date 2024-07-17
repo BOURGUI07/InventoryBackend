@@ -8,9 +8,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.time.Instant;
 import java.util.List;
-import main.entity.Address;
 
 /**
  *
@@ -21,18 +19,13 @@ public record UserDTO(
             Integer id,
             @NotBlank(message = "first name is mandatory")
             @Size(min = 3, max = 50, message = "firstname must be between 3 and 50 characters")
-            String firstName,
-            @NotBlank(message = "last name is mandatory")
-            @Size(min = 3, max = 50, message = "lastname must be between 3 and 50 characters")
-            String lastName,
-            Instant birthdate,
+            String username,
             @NotBlank(message="Password is mandatory")
             @Size(min = 3, max = 50, message = "password must be between 3 and 50 characters")
             String password,
-            Address address,
             @Email(message="Email should be valid")
             String email,
-            String pic,
+            boolean enabled,
             @NotNull(message="CompanyId  can't be null! User Has to Belong to a company.")
             Integer companyId,
             List<Integer> roleIds          

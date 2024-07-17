@@ -11,7 +11,6 @@ import jakarta.validation.Validator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import main.dto.StockMvmDTO;
 import main.dto.UserDTO;
 import main.mapper.UserMapper;
 import main.repo.CompanyRepo;
@@ -66,14 +65,11 @@ public class UserService {
         }
         var  u = repo.findById(id).orElse(null);
         if(u!=null){
-            u.setAddress(x.address());
-            u.setBirthDate(x.birthdate());
-            u.setLastName(x.lastName());
             u.setCompany(companyRepo.findById(x.companyId()).orElse(null));
             u.setEmail(x.email());
-            u.setFirstName(x.firstName());
+            u.setUsername(x.username());
             u.setPassword(x.password());
-            u.setPic(x.pic());
+            u.setEnabled(x.enabled());
             if(x.roleIds()!=null){
                 u.setRoles(roleRepo.findAllById(x.roleIds()));
             }
@@ -88,11 +84,6 @@ public class UserService {
     public void delete(Integer id){
         var u = repo.findById(id).orElse(null);
         if(u!=null){
-            var list = u.getRoles();
-            if(!list.isEmpty()){
-                list.forEach(u::removeRole);
-                roleRepo.saveAll(list);
-            }
             repo.delete(u);
         }
     }
@@ -114,5 +105,13 @@ public class UserService {
     @CacheEvict(value={"UserById", "AllUsers"}, allEntries=true)
     public void clearCache(){
         
+    }
+    
+    public Boolean existsByUsername(String username){
+        return repo.existsByUsername(username);
+    }
+    
+    public boolean existsByEmail(String email){
+        return repo.existsByEmail(email);
     }
 }
