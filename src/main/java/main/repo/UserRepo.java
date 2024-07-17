@@ -4,7 +4,7 @@
  */
 package main.repo;
 
-import main.dto.UserDTO;
+import java.util.Optional;
 import main.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserRepo extends JpaRepository<User, Integer>{
-    UserDTO findByEmail(String email);
+    Optional<User> findByUsername(String username);
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
+    
 }

@@ -168,7 +168,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "204", description = "No categories found"),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
-    @GetMapping("/categories")
+    @GetMapping("/categories/paginated")
     public ResponseEntity<Page<CategoryDTO>> findAllPaginated(
             @RequestParam (defaultValue="0") int page,
             @RequestParam (defaultValue="10") int size,

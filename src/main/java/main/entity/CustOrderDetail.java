@@ -36,7 +36,7 @@ public class CustOrderDetail extends BaseEntity{
     private Product product;
     
     @ManyToOne
-    @JoinColumn(name="cust_order_id")
+    @JoinColumn(name= "cust_order_id")
     @JsonBackReference
     private CustOrder custOrder;
     

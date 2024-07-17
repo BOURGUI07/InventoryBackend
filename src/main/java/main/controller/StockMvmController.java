@@ -129,7 +129,7 @@ public class StockMvmController {
         @ApiResponse(responseCode = "204", description = "No stock movements found"),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
-    @GetMapping
+    @GetMapping("/paginated")
     public ResponseEntity<Page<StockMvmDTO>> findAllPaginated(
             @RequestParam (defaultValue="0") int page,
             @RequestParam (defaultValue="10") int size,

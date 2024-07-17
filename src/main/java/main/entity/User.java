@@ -19,7 +19,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,7 +46,7 @@ public class User extends BaseEntity{
     @Column(name="username")
     private String username;
     
-    @Column(name="password")
+    @Column(name="pass_word")
     private String password;
     
     @Column(name="email")
@@ -61,7 +63,7 @@ public class User extends BaseEntity{
     @JoinTable(name="user_roles", 
                 joinColumns =@JoinColumn(name="user_id"), 
                 inverseJoinColumns=@JoinColumn(name="role_id"))
-    private List<Role> roles = new ArrayList<>();
+    private Set<Role> roles = new HashSet<>();
     
     
 }

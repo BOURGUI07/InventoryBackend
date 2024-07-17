@@ -171,7 +171,7 @@ public class ProductController {
         @ApiResponse(responseCode = "204", description = "No products found"),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
-    @GetMapping
+    @GetMapping("/paginated")
     public ResponseEntity<Page<ProductDTO>> findAllPaginated(
             @RequestParam (defaultValue="0") int page,
             @RequestParam (defaultValue="10") int size,

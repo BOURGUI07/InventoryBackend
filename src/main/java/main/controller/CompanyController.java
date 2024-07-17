@@ -174,7 +174,7 @@ public class CompanyController {
         @ApiResponse(responseCode = "204", description = "No companies found"),
         @ApiResponse(responseCode = "400", description = "Invalid request parameters")
     })
-    @GetMapping
+    @GetMapping("/paginated")
     public ResponseEntity<Page<CompanyDTO>> findAllPaginated(
             @RequestParam (defaultValue="0") int page,
             @RequestParam (defaultValue="10") int size,
